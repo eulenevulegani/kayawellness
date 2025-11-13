@@ -93,19 +93,19 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
   const currentInfo = stageInfo[currentStage.name];
 
   return (
-    <div className="flex flex-col items-center justify-center text-center space-y-8 relative w-full">
+    <div className="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8 relative w-full px-4">
       {/* Simple explanation & Safety Notice */}
-      <div className="max-w-md px-4">
-        <p className="text-xs text-white/60 mb-2">
+      <div className="max-w-md w-full">
+        <p className="text-xs sm:text-sm text-white/60 mb-2">
           💡 <span className="font-medium">Why this helps:</span> Controlled breathing can help activate your body's natural calming response, bringing a sense of ease.
         </p>
-        <p className="text-xs text-white/50 italic">
+        <p className="text-xs sm:text-sm text-white/50 italic">
           You can return to natural breathing anytime. If you feel dizzy or uncomfortable, simply pause and breathe normally.
         </p>
       </div>
 
       {/* Enhanced Breathing Orb */}
-      <div className="relative w-72 h-72 flex items-center justify-center" key={currentStageIndex}>
+      <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center" key={currentStageIndex}>
         {/* Outer glow layers */}
         <div 
           className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/30 via-blue-500/20 to-teal-400/30 opacity-40 blur-[60px] transition-all ease-linear"
@@ -141,7 +141,7 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
         {/* Main orb */}
         <div className="relative z-10">
           <div
-            className="w-48 h-48 rounded-full bg-gradient-to-br from-cyan-400/80 via-teal-500/70 to-blue-500/80 backdrop-blur-xl flex items-center justify-center transition-all ease-linear"
+            className="w-40 h-40 sm:w-48 sm:h-48 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-cyan-400/80 via-teal-500/70 to-blue-500/80 backdrop-blur-xl flex items-center justify-center transition-all ease-linear"
             style={{ 
               transitionDuration: `${currentStage.duration}ms`,
               transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.15)' : 'scale(0.85)',
@@ -166,10 +166,10 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
             
             {/* Content */}
             <div className="relative text-center z-10">
-              <p className="text-base font-light text-white tracking-[0.2em] mb-2 drop-shadow-lg">
+              <p className="text-xs sm:text-sm md:text-base font-light text-white tracking-[0.15em] sm:tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg">
                 {currentInfo.text}
               </p>
-              <p className="text-5xl font-extralight text-white drop-shadow-lg">{Math.ceil(countdown)}</p>
+              <p className="text-4xl sm:text-5xl md:text-6xl font-extralight text-white drop-shadow-lg">{Math.ceil(countdown)}</p>
             </div>
           </div>
         </div>

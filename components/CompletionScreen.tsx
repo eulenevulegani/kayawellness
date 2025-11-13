@@ -21,13 +21,13 @@ const NavItem: React.FC<{
   return (
     <button
       onClick={() => setView(view)}
-      className={`flex flex-col items-center justify-center w-full min-h-[56px] py-2 transition-all duration-200 transform active:scale-95 ${isActive ? 'text-white scale-110' : 'text-white/70 hover:text-white hover:scale-105'}`}
+      className={`flex flex-col items-center justify-center w-full min-h-[52px] sm:min-h-[56px] py-1.5 sm:py-2 transition-all duration-200 transform active:scale-95 ${isActive ? 'text-white scale-105 sm:scale-110' : 'text-white/70 hover:text-white hover:scale-105'}`}
       aria-label={label}
       aria-current={isActive ? 'page' : undefined}
     >
-      <div className={`w-8 h-8 mb-1 flex items-center justify-center transition-transform ${isActive ? 'animate-gentle-pulse' : ''}`}>{icon}</div>
-      <span className={`text-xs font-medium transition-opacity ${isActive ? 'opacity-100' : 'opacity-90'}`}>{label}</span>
-      {isActive && <div className="absolute bottom-0 w-8 h-0.5 bg-white rounded-full"></div>}
+      <div className={`w-6 h-6 sm:w-8 sm:h-8 mb-0.5 sm:mb-1 flex items-center justify-center transition-transform ${isActive ? 'animate-gentle-pulse' : ''}`}>{icon}</div>
+      <span className={`text-[10px] sm:text-xs font-medium transition-opacity ${isActive ? 'opacity-100' : 'opacity-90'}`}>{label}</span>
+      {isActive && <div className="absolute bottom-0 w-6 sm:w-8 h-0.5 bg-white rounded-full"></div>}
     </button>
   );
 };
@@ -41,7 +41,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView }) => {
     : currentView;
 
   return (
-    <nav className="relative z-20 w-full max-w-lg mx-auto bg-black/30 backdrop-blur-lg border-t border-white/20 p-2 safe-area-bottom" role="navigation" aria-label="Main navigation">
+    <nav className="relative z-20 w-full max-w-lg mx-auto bg-black/30 backdrop-blur-lg border-t border-white/20 p-1.5 sm:p-2 pb-safe" role="navigation" aria-label="Main navigation">
       <div className="flex justify-around items-center">
         <NavItem view="stellarHome" label="Home" icon={<HomeIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />
         <NavItem view="cosmicLibrary" label="Library" icon={<LotusIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />

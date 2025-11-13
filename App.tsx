@@ -813,7 +813,7 @@ const App: React.FC = () => {
       
       <main className="relative z-10 w-full h-screen flex flex-col">
         {showGlobalHeader && userProfile && <GlobalHeader userProfile={userProfile} onNavigate={setView} />}
-        <div className={`flex-grow w-full ${['explore', 'journal', 'profile', 'universe', 'community', 'insights', 'events', 'resources', 'therapists'].includes(normalizedView) ? 'overflow-auto' : 'flex items-center justify-center overflow-hidden'} ${!['landing', 'auth', 'verification'].includes(normalizedView) ? 'p-4' : ''}`}>
+        <div className={`flex-grow w-full ${['explore', 'journal', 'profile', 'universe', 'community', 'insights', 'events', 'resources', 'therapists'].includes(normalizedView) ? 'overflow-auto' : 'flex items-center justify-center overflow-hidden'} ${!['landing', 'auth', 'verification'].includes(normalizedView) ? 'p-2 sm:p-4' : ''}`}>
           {renderContent()}
         </div>
         {showAppChrome && <Navigation currentView={view} setView={setView} />}
@@ -823,12 +823,12 @@ const App: React.FC = () => {
       
       {levelUpInfo && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-sm bg-gradient-to-br from-cyan-500/20 to-teal-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-6 text-center">
-            <div className="w-16 h-16 bg-yellow-500/10 text-yellow-300 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse">
-              <StarIcon className="w-9 h-9" />
+          <div className="w-full max-w-sm mx-4 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-6 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/10 text-yellow-300 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse">
+              <StarIcon className="w-7 h-7 sm:w-9 sm:h-9" />
             </div>
-            <h3 className="text-2xl font-semibold text-white">Level Up!</h3>
-            <p className="text-white/80 mt-2 mb-6 text-lg">You've reached Level {levelUpInfo.newLevel}.</p>
+            <h3 className="text-xl sm:text-2xl font-semibold text-white">Level Up!</h3>
+            <p className="text-white/80 mt-2 mb-6 text-base sm:text-lg">You've reached Level {levelUpInfo.newLevel}.</p>
             <button
               onClick={() => setLevelUpInfo(null)}
               className="w-full px-6 py-2 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold hover:opacity-90 transition"
@@ -841,13 +841,13 @@ const App: React.FC = () => {
 
       {newlyUnlockedAchievement && (
          <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-sm bg-gradient-to-br from-cyan-500/20 to-teal-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-6 text-center">
-             <div className="w-16 h-16 bg-yellow-500/10 text-yellow-300 rounded-full flex items-center justify-center mx-auto mb-4">
-               <StarIcon className="w-9 h-9" />
+          <div className="w-full max-w-sm mx-4 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-6 text-center">
+             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/10 text-yellow-300 rounded-full flex items-center justify-center mx-auto mb-4">
+               <StarIcon className="w-7 h-7 sm:w-9 sm:h-9" />
              </div>
-             <p className="text-sm font-semibold uppercase tracking-wider text-yellow-400">Achievement Unlocked</p>
-             <h3 className="text-xl font-semibold text-white mt-2">{newlyUnlockedAchievement.title}</h3>
-             <p className="text-white/70 mt-2 mb-6">{newlyUnlockedAchievement.description}</p>
+             <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-yellow-400">Achievement Unlocked</p>
+             <h3 className="text-lg sm:text-xl font-semibold text-white mt-2">{newlyUnlockedAchievement.title}</h3>
+             <p className="text-sm sm:text-base text-white/70 mt-2 mb-6">{newlyUnlockedAchievement.description}</p>
              <button
                onClick={() => setNewlyUnlockedAchievement(null)}
                className="w-full px-6 py-2 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold hover:opacity-90 transition"

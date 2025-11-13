@@ -22,12 +22,12 @@ interface DashboardProps {
 const SessionCompletedView: React.FC<{ onNavigate: (view: AppView) => void, userProfile: UserProfile, sessionHistory: SessionHistoryEntry[] }> = ({ onNavigate, userProfile, sessionHistory }) => {
     return (
         <div className="w-full max-w-xl mx-auto p-4 animate-fade-in text-center">
-            <div className="bg-white/10 border border-white/20 rounded-2xl p-8">
-                <div className="w-20 h-20 mb-6 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full flex items-center justify-center text-cyan-400 mx-auto animate-gentle-pulse">
-                    <StarIcon className="w-10 h-10" />
+            <div className="bg-white/10 border border-white/20 rounded-2xl p-6 sm:p-8">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-6 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full flex items-center justify-center text-cyan-400 mx-auto animate-gentle-pulse">
+                    <StarIcon className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
-                <h2 className="text-3xl font-light text-white">Your light shines brighter</h2>
-                <p className="text-white/70 mt-3 mb-6 max-w-md mx-auto">
+                <h2 className="text-2xl sm:text-3xl font-light text-white">Your light shines brighter</h2>
+                <p className="text-sm sm:text-base text-white/70 mt-3 mb-6 max-w-md mx-auto">
                     Another star added to your Stellar System. The universe noticed your dedication today.
                 </p>
                  <div className="relative w-full h-48 bg-white/5 border border-white/10 rounded-lg p-2 flex items-center justify-center my-6">
@@ -189,13 +189,13 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, achievements, sessio
     };
 
     return (
-      <div className="w-full h-[90vh] flex items-center justify-center">
-        <div className="w-full max-w-4xl mx-auto p-4 flex flex-col" style={{ height: '70vh' }}>
+      <div className="w-full min-h-[80vh] sm:h-[90vh] flex items-center justify-center px-2 sm:px-4">
+        <div className="w-full max-w-4xl mx-auto p-3 sm:p-4 flex flex-col" style={{ minHeight: '60vh' }}>
           {/* Active Program Status */}
           {activeProgram && !selectedMood && (
-            <div className="mb-6 bg-white/5 border border-white/10 rounded-xl p-4 text-center animate-fade-in">
-              <p className="font-semibold text-white text-base">{activeProgram.title}</p>
-              <p className="text-sm text-white/70 mt-1">Day {userProfile.programProgress} of {activeProgram.duration}</p>
+            <div className="mb-4 sm:mb-6 bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center animate-fade-in">
+              <p className="font-semibold text-white text-sm sm:text-base">{activeProgram.title}</p>
+              <p className="text-xs sm:text-sm text-white/70 mt-1">Day {userProfile.programProgress} of {activeProgram.duration}</p>
               <div className="w-full bg-white/10 rounded-full h-2 mt-3">
                 <div className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-500" style={{ width: `${(userProfile.programProgress / activeProgram.duration) * 100}%` }}></div>
               </div>

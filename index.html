@@ -9,11 +9,14 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.svg" />
     <link rel="apple-touch-icon" href="/icon-512.svg" />
     
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     
     <!-- Meta Tags -->
     <meta name="description" content="KAYA - Your AI-powered wellness companion for meditation, breathwork, and mindful living. Find calm, build resilience, and live better." />
     <meta name="theme-color" content="#0e7490" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
@@ -97,6 +100,49 @@
       /* Safe area support for notched devices */
       .safe-area-bottom {
         padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+      }
+      
+      .pb-safe {
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+      }
+      
+      /* Touch-friendly tap targets (minimum 44x44px) */
+      button, a, [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      
+      /* Prevent text selection on tap for better mobile UX */
+      button, .no-select {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+      
+      /* Prevent horizontal scroll */
+      body, html {
+        overflow-x: hidden;
+        width: 100%;
+      }
+      
+      /* Mobile responsive text */
+      @media (max-width: 640px) {
+        body {
+          font-size: 14px;
+        }
+      }
+      
+      /* Landscape mobile adjustments */
+      @media (max-height: 500px) and (orientation: landscape) {
+        .min-h-screen {
+          min-height: 100vh;
+        }
       }
     </style>
   <script type="importmap">

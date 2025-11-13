@@ -47,52 +47,52 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, userProfile }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-cyan-600/10"></div>
         
         {/* Minimal Header */}
-        <header className="w-full max-w-6xl mx-auto p-6 flex justify-between items-center relative z-10">
-          <span className="text-2xl font-extralight text-white tracking-[0.3em]">KAYA</span>
-          <div className="flex items-center gap-3">
+        <header className="w-full max-w-6xl mx-auto p-4 sm:p-6 flex justify-between items-center relative z-10">
+          <span className="text-xl sm:text-2xl font-extralight text-white tracking-[0.3em]">KAYA</span>
+          <div className="flex items-center gap-2 sm:gap-3">
             <button 
               onClick={handleLogin} 
-              className="px-6 py-2.5 bg-transparent border border-white/30 text-white rounded-full font-medium hover:bg-white/10 hover:border-white/40 transition-all text-sm"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-transparent border border-white/30 text-white rounded-full font-medium hover:bg-white/10 hover:border-white/40 transition-all text-xs sm:text-sm"
             >
               Log In
             </button>
             <button 
               onClick={handleStartFreeTrial} 
-              className="px-6 py-2.5 bg-white text-cyan-600 rounded-full font-semibold hover:bg-white/90 transition-all text-sm shadow-lg"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-white text-cyan-600 rounded-full font-semibold hover:bg-white/90 transition-all text-xs sm:text-sm shadow-lg"
             >
-              Start Free Trial
+              Start<span className="hidden sm:inline"> Free Trial</span>
             </button>
           </div>
         </header>
 
         <main className="relative z-10">
           {/* Hero Section - Splash-inspired */}
-          <section className="w-full max-w-4xl mx-auto text-center py-24 md:py-32 px-4 relative min-h-[80vh] flex flex-col items-center justify-center">
+          <section className="w-full max-w-4xl mx-auto text-center py-16 sm:py-24 md:py-32 px-4 relative min-h-[70vh] sm:min-h-[80vh] flex flex-col items-center justify-center">
             
             {/* Central universe orb with KAYA text */}
-            <div className="flex justify-center mb-12">
-              <PulsingOrb size="xl" variant="cyan" intensity="medium">
-                <span className="text-xl md:text-2xl font-extralight text-white tracking-[0.3em]">KAYA</span>
+            <div className="flex justify-center mb-8 sm:mb-12">
+              <PulsingOrb size="lg" variant="cyan" intensity="medium" className="sm:w-48 sm:h-48">
+                <span className="text-lg sm:text-xl md:text-2xl font-extralight text-white tracking-[0.3em]">KAYA</span>
               </PulsingOrb>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-extralight tracking-tight text-white leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extralight tracking-tight text-white leading-tight mb-4 sm:mb-6">
               Your Calm Universe
             </h1>
-            <p className="mt-4 text-base md:text-lg text-white/60 max-w-lg mx-auto font-light">
+            <p className="mt-2 sm:mt-4 text-sm sm:text-base md:text-lg text-white/60 max-w-lg mx-auto font-light px-4">
               AI-powered mindfulness that adapts to you.<br/>Find calm. Build resilience. Live better.
             </p>
             
-            <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">
+            <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto px-4">
               <button
                 onClick={handleStartFreeTrial}
-                className="px-12 py-4 bg-white text-cyan-600 rounded-full font-semibold text-base hover:bg-white/90 transform hover:scale-105 transition-all duration-300 shadow-2xl"
+                className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-4 bg-white text-cyan-600 rounded-full font-semibold text-sm sm:text-base hover:bg-white/90 transform hover:scale-105 transition-all duration-300 shadow-2xl"
               >
                 Start Free Trial
               </button>
               <button
                 onClick={handleLogin}
-                className="px-12 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-medium text-base hover:bg-white/20 hover:border-white/40 transform hover:scale-105 transition-all duration-300"
+                className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-medium text-sm sm:text-base hover:bg-white/20 hover:border-white/40 transform hover:scale-105 transition-all duration-300"
               >
                 Log In
               </button>
