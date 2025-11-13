@@ -92,86 +92,181 @@ const MeditationPlayer: React.FC<{ script: string, title: string, onAudioEnd: ()
 
 const getSoundscapeUrl = (title: string, userProfile?: UserProfile, mood?: string): string => {
   const lowerTitle = title.toLowerCase();
-  
-  // Soundscape library with contextual mapping
+
+  // Soundscape library with contextual mapping - using more reliable calming sounds
   const soundscapes = {
-    rain: 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3',
-    forest: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3',
-    cosmic: 'https://assets.mixkit.co/active_storage/sfx/513/513-preview.mp3',
-    ocean: 'https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3',
-    ambient: 'https://assets.mixkit.co/active_storage/sfx/2466/2466-preview.mp3'
+    rain: 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3', // Gentle rain
+    forest: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3', // Forest ambience
+    cosmic: 'https://assets.mixkit.co/active_storage/sfx/513/513-preview.mp3', // Cosmic/space sound
+    ocean: 'https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3', // Ocean waves
+    ambient: 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3', // Default to gentle rain instead of potentially problematic ambient
+    meditation: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3', // Forest for meditation
+    calm: 'https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3' // Ocean for calm
   };
-  
+
   // First priority: Title keywords (AI already chose based on context)
-  if (lowerTitle.includes('rain')) return soundscapes.rain;
-  if (lowerTitle.includes('forest') || lowerTitle.includes('meadow') || lowerTitle.includes('sunlit')) return soundscapes.forest;
-  if (lowerTitle.includes('cosmic') || lowerTitle.includes('space') || lowerTitle.includes('drift')) return soundscapes.cosmic;
-  if (lowerTitle.includes('ocean') || lowerTitle.includes('waves') || lowerTitle.includes('sea')) return soundscapes.ocean;
-  
+  if (lowerTitle.includes('rain') || lowerTitle.includes('gentle') || lowerTitle.includes('soft')) return soundscapes.rain;
+  if (lowerTitle.includes('forest') || lowerTitle.includes('meadow') || lowerTitle.includes('sunlit') || lowerTitle.includes('nature')) return soundscapes.forest;
+  if (lowerTitle.includes('cosmic') || lowerTitle.includes('space') || lowerTitle.includes('drift') || lowerTitle.includes('universe')) return soundscapes.cosmic;
+  if (lowerTitle.includes('ocean') || lowerTitle.includes('waves') || lowerTitle.includes('sea') || lowerTitle.includes('beach')) return soundscapes.ocean;
+  if (lowerTitle.includes('meditation') || lowerTitle.includes('mindful')) return soundscapes.meditation;
+  if (lowerTitle.includes('calm') || lowerTitle.includes('peace') || lowerTitle.includes('serene')) return soundscapes.calm;
+
   // Second priority: User profile and mood-based intelligent fallback
   if (userProfile && mood) {
     const lowerMood = mood.toLowerCase();
-    
-    // Sleep-related goals or tired/sleepy mood → Ocean waves
-    if (userProfile.goals.some(g => g.toLowerCase().includes('sleep')) || 
+
+    // Sleep-related goals or tired/sleepy mood → Ocean waves (soothing)
+    if (userProfile.goals.some(g => g.toLowerCase().includes('sleep')) ||
         lowerMood.includes('tired') || lowerMood.includes('sleepy') || lowerMood.includes('exhausted')) {
       return soundscapes.ocean;
     }
-    
-    // Anxiety/stress goals or anxious/stressed mood → Rain
+
+    // Anxiety/stress goals or anxious/stressed mood → Rain (gentle, masking)
     if (userProfile.goals.some(g => g.toLowerCase().includes('anxiety') || g.toLowerCase().includes('stress')) ||
         lowerMood.includes('anxious') || lowerMood.includes('stressed') || lowerMood.includes('overwhelmed')) {
       return soundscapes.rain;
     }
-    
-    // Focus/productivity goals or scattered/unfocused mood → Forest
+
+    // Focus/productivity goals or scattered/unfocused mood → Forest (natural concentration)
     if (userProfile.goals.some(g => g.toLowerCase().includes('focus') || g.toLowerCase().includes('productivity')) ||
         lowerMood.includes('distracted') || lowerMood.includes('scattered') || lowerMood.includes('unfocused')) {
       return soundscapes.forest;
     }
-    
-    // Happy/peaceful/calm moods → Cosmic
-    if (lowerMood.includes('happy') || lowerMood.includes('peaceful') || 
-        lowerMood.includes('calm') || lowerMood.includes('joyful')) {
+
+    // Happy/peaceful/calm moods → Cosmic (uplifting, expansive)
+    if (lowerMood.includes('happy') || lowerMood.includes('peaceful') ||
+        lowerMood.includes('calm') || lowerMood.includes('joyful') || lowerMood.includes('content')) {
       return soundscapes.cosmic;
     }
   }
-  
-  // Final fallback
-  return soundscapes.ambient;
+
+  // Final fallback - always use gentle rain for maximum calmness
+  return soundscapes.rain;
 };
 
-const IntegratedSoundscapePlayer: React.FC<{ 
+const IntegratedSoundscapePlayer: React.FC<{
   soundscape: PersonalizedSessionData['soundscape'];
   userProfile?: UserProfile;
   mood?: string;
 }> = ({ soundscape, userProfile, mood }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
+    const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
+    const [oscillator, setOscillator] = useState<OscillatorNode | null>(null);
     const audioUrl = getSoundscapeUrl(soundscape.title, userProfile, mood);
 
-    useEffect(() => {
-        const audio = new Audio(audioUrl);
-        audio.loop = true;
-        audio.volume = 0.5;
-        audioRef.current = audio;
+    // Fallback frequency based on mood/goals
+    const getFallbackFrequency = () => {
+      if (!userProfile || !mood) return 432; // Default healing frequency
 
-        const handleCanPlay = () => {
-            setIsLoading(false);
-            audio.play().catch(() => {}); // Autoplay, ignore error if blocked
+      const lowerMood = mood.toLowerCase();
+      if (userProfile.goals.some(g => g.toLowerCase().includes('sleep')) ||
+          lowerMood.includes('tired') || lowerMood.includes('sleepy')) {
+        return 396; // Liberation frequency for sleep
+      }
+      if (userProfile.goals.some(g => g.toLowerCase().includes('anxiety') || g.toLowerCase().includes('stress')) ||
+          lowerMood.includes('anxious') || lowerMood.includes('stressed')) {
+        return 528; // Love frequency for anxiety
+      }
+      if (userProfile.goals.some(g => g.toLowerCase().includes('focus')) ||
+          lowerMood.includes('distracted') || lowerMood.includes('scattered')) {
+        return 528; // Transformation frequency for focus
+      }
+      return 432; // Miracle frequency for general wellbeing
+    };
+
+    useEffect(() => {
+        const initAudio = async () => {
+          try {
+            // Try external audio first
+            const audio = new Audio(audioUrl);
+            audio.loop = true;
+            audio.volume = 0.3; // Lower volume for background ambience
+
+            const handleCanPlay = () => {
+              setIsLoading(false);
+              audio.play().catch(() => {
+                // If external audio fails, fall back to generated tone
+                console.log('External soundscape failed, using generated frequency');
+                useGeneratedTone();
+              });
+            };
+
+            const handleError = () => {
+              console.log('External soundscape error, using generated frequency');
+              useGeneratedTone();
+            };
+
+            audio.addEventListener('canplaythrough', handleCanPlay);
+            audio.addEventListener('error', handleError);
+            setAudioRef(audio);
+
+            // Timeout fallback in case audio never loads
+            setTimeout(() => {
+              if (isLoading) {
+                console.log('Audio loading timeout, using generated frequency');
+                useGeneratedTone();
+              }
+            }, 5000);
+
+          } catch (error) {
+            console.log('Audio initialization failed, using generated frequency');
+            useGeneratedTone();
+          }
         };
-        audio.addEventListener('canplaythrough', handleCanPlay);
+
+        const useGeneratedTone = () => {
+          try {
+            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = getFallbackFrequency();
+            gainNode.gain.value = 0.1; // Very low volume for background
+
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            osc.start();
+
+            setAudioCtx(ctx);
+            setOscillator(osc);
+            setIsLoading(false);
+          } catch (error) {
+            console.error('Generated tone failed:', error);
+            setIsLoading(false);
+          }
+        };
+
+        initAudio();
 
         return () => {
-            audio.removeEventListener('canplaythrough', handleCanPlay);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
+            // Cleanup external audio
+            if (audioRef) {
+                audioRef.pause();
+                audioRef.removeEventListener('canplaythrough', () => {});
+                audioRef.removeEventListener('error', () => {});
+                setAudioRef(null);
+            }
+            // Cleanup generated tone
+            if (oscillator) {
+                try {
+                  oscillator.stop();
+                  oscillator.disconnect();
+                } catch {}
+                setOscillator(null);
+            }
+            if (audioCtx) {
+                try {
+                  audioCtx.close();
+                } catch {}
+                setAudioCtx(null);
             }
         };
-    }, [audioUrl]);
+    }, [audioUrl, userProfile, mood]);
 
-    return null;
+    return null; // Invisible background player
 };
 
 
