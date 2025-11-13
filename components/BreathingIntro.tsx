@@ -5,6 +5,10 @@ interface BreathingIntroProps {
 }
 
 const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
+    // Sound frequency oscillator state
+    const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
+    const [oscillator, setOscillator] = useState<OscillatorNode | null>(null);
+    const FREQUENCY = 432; // Hz (can change to 528, 396, etc.)
   const [phase, setPhase] = useState<'intro' | 'breathing' | 'complete'>('intro');
   const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale' | 'rest'>('inhale');
   const [cycleCount, setCycleCount] = useState(0);
@@ -13,7 +17,42 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
   const totalCycles = 3;
 
   useEffect(() => {
-    if (phase !== 'breathing') return;
+    if (phase !== 'breathing') {
+      // Cleanup: stop oscillator when phase changes away from breathing
+      if (oscillator) {
+        try {
+          oscillator.stop();
+          oscillator.disconnect();
+        } catch {}
+        setOscillator(null);
+      }
+      if (audioCtx) {
+        try {
+          audioCtx.close();
+        } catch {}
+        setAudioCtx(null);
+      }
+      return;
+    }
+
+    // Start oscillator on breathing phase
+    if (!audioCtx) {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      setAudioCtx(ctx);
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = FREQUENCY;
+      osc.connect(ctx.destination);
+      osc.start();
+      setOscillator(osc);
+    } else if (!oscillator) {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = FREQUENCY;
+      osc.connect(audioCtx.destination);
+      osc.start();
+      setOscillator(osc);
+    }
 
     const breathingSequence = [
       { phase: 'inhale', duration: 4000 },
@@ -46,6 +85,23 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
     };
 
     runBreathingCycle();
+    // Cleanup: stop oscillator when phase changes
+    return () => {
+      if (oscillator) {
+        try {
+          oscillator.stop();
+          oscillator.disconnect();
+        } catch {}
+        setOscillator(null);
+      }
+      if (audioCtx) {
+        try {
+          audioCtx.close();
+        } catch {}
+        setAudioCtx(null);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
   const feelings = [
