@@ -148,12 +148,59 @@ export const generatePersonalizedSession = async (
                             experienceLevel === 'intermediate' ? 'moderate guidance with some independence' : 
                             'minimal guidance, allowing for self-directed practice';
         
-        const prompt = `Create a personalized wellness session for ${userProfile.name} (Experience level: ${experienceLevel}).
+        // Build context-aware personalization insights
+        const ageContext = userProfile.ageRange ? `Age range: ${userProfile.ageRange}` : '';
+        const lifeStageContext = userProfile.lifeStage ? `Life stage: ${userProfile.lifeStage}` : '';
+        const timeContext = userProfile.preferredTime ? `Preferred practice time: ${userProfile.preferredTime}` : '';
+        const sessionLengthPref = userProfile.sessionLengthPreference || userProfile.sessionLength;
+        
+        // Determine breathing pattern based on experience and goals
+        let breathingGuidance = '';
+        if (experienceLevel === 'beginner') {
+            breathingGuidance = 'Use gentle, equal breathing patterns (4-4 inhale-exhale) or simple box breathing (4-4-4-4). Keep it simple and reassuring.';
+        } else if (experienceLevel === 'intermediate') {
+            if (userProfile.goals.includes('better sleep') || conversationContext.toLowerCase().includes('anxious')) {
+                breathingGuidance = 'Use calming 4-7-8 breathing (inhale 4, hold 7, exhale 8) to activate parasympathetic response.';
+            } else if (userProfile.goals.includes('focus') || userProfile.goals.includes('productivity')) {
+                breathingGuidance = 'Use box breathing (4-4-4-4) for mental clarity and focus.';
+            } else {
+                breathingGuidance = 'Use resonant breathing (5-5 or 6-6) for balanced nervous system regulation.';
+            }
+        } else {
+            breathingGuidance = 'Use advanced techniques like alternate nostril breathing or extended exhale breathing (4-2-6-2) based on their goals.';
+        }
+        
+        // Soundscape guidance based on user preferences and context
+        let soundscapeGuidance = '';
+        if (userProfile.goals.includes('better sleep') || conversationContext.toLowerCase().includes('sleep') || conversationContext.toLowerCase().includes('tired')) {
+            soundscapeGuidance = 'Suggest soothing soundscapes: gentle rain, soft ocean waves, or distant thunder.';
+        } else if (userProfile.goals.includes('focus') || userProfile.goals.includes('productivity')) {
+            soundscapeGuidance = 'Suggest focused soundscapes: forest ambience, flowing stream, or white noise.';
+        } else if (conversationContext.toLowerCase().includes('anxious') || conversationContext.toLowerCase().includes('stressed')) {
+            soundscapeGuidance = 'Suggest calming soundscapes: soft rain, crackling fireplace, or cosmic drones.';
+        } else {
+            soundscapeGuidance = 'Suggest uplifting soundscapes: morning birds, gentle wind chimes, or cosmic harmony.';
+        }
+        
+        const prompt = `Create a deeply personalized wellness session for ${userProfile.name}.
 
-Context: ${conversationContext}
-Goals: ${userProfile.goals.join(', ')}
-Session Length: ${userProfile.sessionLength}
+USER PROFILE:
+- Experience level: ${experienceLevel}
+- Goals: ${userProfile.goals.join(', ')}
+- Session length preference: ${sessionLengthPref} minutes
+${ageContext ? `- ${ageContext}` : ''}
+${lifeStageContext ? `- ${lifeStageContext}` : ''}
+${timeContext ? `- ${timeContext}` : ''}
+
+CURRENT CONTEXT:
+${conversationContext}
 ${programContext ? `Program: ${programContext.title} - Day ${programContext.day}: ${programContext.theme}` : ''}
+
+PERSONALIZATION REQUIREMENTS:
+1. AFFIRMATION: Must directly relate to their stated goals (${userProfile.goals.join(', ')}). Use their life stage and age context to make it more relevant.
+2. BREATHING EXERCISE: ${breathingGuidance}
+3. SOUNDSCAPE: ${soundscapeGuidance}
+4. MEDITATION SCRIPT: Address their specific goals and current mood. ${guidanceLevel}
 
 WELLNESS GUIDELINES (IMPORTANT):
 1. Use gentle, inviting language:
@@ -202,26 +249,54 @@ Make it personalized, compassionate, supportive, and contextually appropriate. R
         throw new Error('Failed to generate valid session');
     } catch (error) {
         console.error('Session generation error:', error);
-        // Return wellbeing-focused fallback session
+        // Return wellbeing-focused fallback session personalized to user
         const isBeginnerLevel = !userProfile.experienceLevel || userProfile.experienceLevel === 'beginner';
         
+        // Personalize fallback soundscape based on goals
+        let fallbackSoundscape = { title: 'Gentle Rain', description: 'Soft, natural rain sounds that may help you feel grounded and present.' };
+        if (userProfile.goals.includes('better sleep')) {
+            fallbackSoundscape = { title: 'Ocean Waves', description: 'Gentle waves lapping at the shore, soothing and peaceful.' };
+        } else if (userProfile.goals.includes('focus')) {
+            fallbackSoundscape = { title: 'Forest Stream', description: 'Flowing water through a peaceful forest.' };
+        }
+        
+        // Personalize fallback affirmation to user's primary goal
+        let fallbackAffirmation = `${userProfile.name}, you might notice that you are present in this moment. Whatever you're feeling right now is okay.`;
+        if (userProfile.goals.length > 0) {
+            const primaryGoal = userProfile.goals[0];
+            if (primaryGoal.toLowerCase().includes('stress')) {
+                fallbackAffirmation = `${userProfile.name}, you might notice that with each breath, you're allowing stress to soften. You're doing beautifully.`;
+            } else if (primaryGoal.toLowerCase().includes('sleep')) {
+                fallbackAffirmation = `${userProfile.name}, rest is a gift you give yourself. You deserve peaceful, restorative sleep.`;
+            } else if (primaryGoal.toLowerCase().includes('anxiety')) {
+                fallbackAffirmation = `${userProfile.name}, you might notice that this moment is safe. You're exactly where you need to be.`;
+            } else if (primaryGoal.toLowerCase().includes('focus')) {
+                fallbackAffirmation = `${userProfile.name}, your mind is capable and clear. You can gently return to this moment whenever you choose.`;
+            }
+        }
+        
+        // Adapt breathing pattern to experience level
+        let breathPattern = { inhale: 4, hold: 0, exhale: 4 }; // Beginner default
+        if (userProfile.experienceLevel === 'intermediate') {
+            breathPattern = { inhale: 4, hold: 4, exhale: 4, holdAfterExhale: 4 }; // Box breathing
+        } else if (userProfile.experienceLevel === 'advanced') {
+            breathPattern = { inhale: 4, hold: 7, exhale: 8 }; // 4-7-8 breathing
+        }
+        
         return {
-            soundscape: { 
-                title: 'Gentle Rain', 
-                description: 'Soft, natural rain sounds that may help you feel grounded and present.' 
-            },
+            soundscape: fallbackSoundscape,
             steps: [
                 { 
                     type: 'affirmation', 
                     data: { 
-                        text: `${userProfile.name}, you might notice that you are present in this moment. Whatever you're feeling right now is okay.` 
+                        text: fallbackAffirmation
                     } 
                 },
                 { 
                     type: 'breathwork', 
                     data: { 
-                        title: 'Gentle Equal Breathing', 
-                        pattern: { inhale: 4, hold: 0, exhale: 4 } // Gentle, no holding for beginners
+                        title: isBeginnerLevel ? 'Gentle Equal Breathing' : userProfile.experienceLevel === 'intermediate' ? 'Box Breathing' : 'Calming 4-7-8 Breath',
+                        pattern: breathPattern
                     } 
                 },
                 { 

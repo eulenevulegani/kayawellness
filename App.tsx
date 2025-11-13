@@ -731,7 +731,7 @@ const App: React.FC = () => {
         {view === 'setupComplete' && <SetupComplete userName={userProfile.name} onContinue={handleSetupConfirmed} />}
         {view === 'dashboard' && <Dashboard userProfile={userProfile} achievements={achievements} sessionHistory={sessionHistory} onShowAffirmation={handleShowAffirmation} programs={WELLNESS_PROGRAMS} sessionCompletedToday={sessionCompletedToday} onNavigate={setView} />}
         {view === 'affirmation' && <Affirmation affirmation={currentAffirmation} userName={userProfile.name} onContinue={handleProceedToSession} />}
-        {view === 'session' && sessionStepsForPlayer && <PersonalizedSession session={sessionStepsForPlayer} onComplete={handleSessionComplete} userProfile={userProfile} />}
+        {view === 'session' && sessionStepsForPlayer && <PersonalizedSession session={sessionStepsForPlayer} onComplete={handleSessionComplete} userProfile={userProfile} mood={lastMood} />}
         {view === 'completion' && <PostSessionScreen onAddGratitude={handleAddGratitude} onDone={handleCompletionDone} gratitudeEntries={gratitudeEntries} onSaveReflection={() => {}} />}
         {view === 'programComplete' && completedProgram && <ProgramComplete program={completedProgram} onContinue={handleProgramCompletionContinue} />}
         {view === 'explore' && <Explore programs={WELLNESS_PROGRAMS} onStartProgram={handleStartProgram} onStartActivity={handleStartActivity} onNavigate={setView} userProfile={userProfile} />}

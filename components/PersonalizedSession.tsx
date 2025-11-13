@@ -9,6 +9,7 @@ interface PersonalizedSessionProps {
   session: PersonalizedSessionData;
   onComplete: () => void;
   userProfile: UserProfile;
+  mood?: string;
 }
 
 const MeditationPlayer: React.FC<{ script: string, title: string, onAudioEnd: () => void }> = ({ script, title, onAudioEnd }) => {
@@ -89,21 +90,65 @@ const MeditationPlayer: React.FC<{ script: string, title: string, onAudioEnd: ()
   );
 };
 
-const getSoundscapeUrl = (title: string): string => {
+const getSoundscapeUrl = (title: string, userProfile?: UserProfile, mood?: string): string => {
   const lowerTitle = title.toLowerCase();
-  // Using reliable free audio sources
-  if (lowerTitle.includes('rain')) return 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3';
-  if (lowerTitle.includes('forest') || lowerTitle.includes('meadow') || lowerTitle.includes('sunlit')) return 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3';
-  if (lowerTitle.includes('cosmic') || lowerTitle.includes('space') || lowerTitle.includes('drift')) return 'https://assets.mixkit.co/active_storage/sfx/513/513-preview.mp3';
-  if (lowerTitle.includes('ocean') || lowerTitle.includes('waves')) return 'https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3';
-  // Fallback sound - gentle ambient
-  return 'https://assets.mixkit.co/active_storage/sfx/2466/2466-preview.mp3';
+  
+  // Soundscape library with contextual mapping
+  const soundscapes = {
+    rain: 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3',
+    forest: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3',
+    cosmic: 'https://assets.mixkit.co/active_storage/sfx/513/513-preview.mp3',
+    ocean: 'https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3',
+    ambient: 'https://assets.mixkit.co/active_storage/sfx/2466/2466-preview.mp3'
+  };
+  
+  // First priority: Title keywords (AI already chose based on context)
+  if (lowerTitle.includes('rain')) return soundscapes.rain;
+  if (lowerTitle.includes('forest') || lowerTitle.includes('meadow') || lowerTitle.includes('sunlit')) return soundscapes.forest;
+  if (lowerTitle.includes('cosmic') || lowerTitle.includes('space') || lowerTitle.includes('drift')) return soundscapes.cosmic;
+  if (lowerTitle.includes('ocean') || lowerTitle.includes('waves') || lowerTitle.includes('sea')) return soundscapes.ocean;
+  
+  // Second priority: User profile and mood-based intelligent fallback
+  if (userProfile && mood) {
+    const lowerMood = mood.toLowerCase();
+    
+    // Sleep-related goals or tired/sleepy mood → Ocean waves
+    if (userProfile.goals.some(g => g.toLowerCase().includes('sleep')) || 
+        lowerMood.includes('tired') || lowerMood.includes('sleepy') || lowerMood.includes('exhausted')) {
+      return soundscapes.ocean;
+    }
+    
+    // Anxiety/stress goals or anxious/stressed mood → Rain
+    if (userProfile.goals.some(g => g.toLowerCase().includes('anxiety') || g.toLowerCase().includes('stress')) ||
+        lowerMood.includes('anxious') || lowerMood.includes('stressed') || lowerMood.includes('overwhelmed')) {
+      return soundscapes.rain;
+    }
+    
+    // Focus/productivity goals or scattered/unfocused mood → Forest
+    if (userProfile.goals.some(g => g.toLowerCase().includes('focus') || g.toLowerCase().includes('productivity')) ||
+        lowerMood.includes('distracted') || lowerMood.includes('scattered') || lowerMood.includes('unfocused')) {
+      return soundscapes.forest;
+    }
+    
+    // Happy/peaceful/calm moods → Cosmic
+    if (lowerMood.includes('happy') || lowerMood.includes('peaceful') || 
+        lowerMood.includes('calm') || lowerMood.includes('joyful')) {
+      return soundscapes.cosmic;
+    }
+  }
+  
+  // Final fallback
+  return soundscapes.ambient;
 };
 
-const IntegratedSoundscapePlayer: React.FC<{ soundscape: PersonalizedSessionData['soundscape'] }> = ({ soundscape }) => {
+const IntegratedSoundscapePlayer: React.FC<{ 
+  soundscape: PersonalizedSessionData['soundscape'];
+  userProfile?: UserProfile;
+  mood?: string;
+}> = ({ soundscape, userProfile, mood }) => {
     const [isLoading, setIsLoading] = useState(true);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const audioUrl = getSoundscapeUrl(soundscape.title);
+    const audioUrl = getSoundscapeUrl(soundscape.title, userProfile, mood);
 
     useEffect(() => {
         const audio = new Audio(audioUrl);
@@ -130,7 +175,7 @@ const IntegratedSoundscapePlayer: React.FC<{ soundscape: PersonalizedSessionData
 };
 
 
-const PersonalizedSession: React.FC<PersonalizedSessionProps> = ({ session, onComplete, userProfile }) => {
+const PersonalizedSession: React.FC<PersonalizedSessionProps> = ({ session, onComplete, userProfile, mood }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [copied, setCopied] = useState(false);
   const currentStep = session.steps[currentStepIndex];
@@ -303,7 +348,7 @@ const PersonalizedSession: React.FC<PersonalizedSessionProps> = ({ session, onCo
                 </button>
             </div>
 
-            <IntegratedSoundscapePlayer soundscape={session.soundscape} />
+            <IntegratedSoundscapePlayer soundscape={session.soundscape} userProfile={userProfile} mood={mood} />
 
             <main className="flex-grow flex items-center justify-center w-full px-4">
                 {renderStepContent(currentStep)}

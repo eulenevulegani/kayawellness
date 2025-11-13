@@ -64,7 +64,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
   }, []);
 
   const [step, setStep] = useState(1);
-  const totalSteps = 7; // Streamlined setup (removed intro and redundant preferred time)
+  const totalSteps = 8; // Streamlined setup with essential personalization questions
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -157,9 +157,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
       // Step 5: Preferences (time & length) - has default values
       // Step 6: Voice preference - optional, always can continue
       // Step 7: Check-in times - has default value
-      // Step 8: Schedule - has default values
-      // Step 9: Name, Email & Password - THE SUN (center of your universe)
-      if (step === 9) {
+      // Step 7: Schedule - has default values
+      // Step 8: Name, Email & Password - THE SUN (center of your universe)
+      if (step === 8) {
         const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
         const passwordValid = password.trim().length >= 8;
         return name.trim().length < 2 || !emailValid || !passwordValid;
@@ -381,12 +381,12 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 6:
+      case 7:
         return (
-          <div key={6} className="animate-fade-in">
+          <div key={7} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Cosmic Schedule</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
-              🌞 Planet 8: Aligning with your sun and moon
+              🌞 Planet 7: Aligning with your sun and moon
             </p>
             <div className="space-y-4 max-w-md mx-auto">
               <div className="bg-white/5 border border-white/20 rounded-xl p-4">
@@ -422,9 +422,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 7:
+      case 8:
         return (
-          <div key={7} className="animate-fade-in">
+          <div key={8} className="animate-fade-in">
             <div className="mb-6 text-center">
               <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse shadow-2xl shadow-white/30">
                 <div className="w-18 h-18 bg-white/80 rounded-full flex items-center justify-center">
@@ -436,7 +436,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                 ☀️ The Center of Your Universe
               </p>
               <p className="text-cyan-300 text-xs max-w-xl mx-auto">
-                You've journeyed through 8 celestial realms. Now place yourself at the center—radiant, powerful, and complete.
+                You've journeyed through 7 celestial realms. Now place yourself at the center—radiant, powerful, and complete.
               </p>
             </div>
             <div className="space-y-3.5 max-w-md mx-auto">
@@ -528,11 +528,11 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                           isContinueDisabled()
                             ? 'bg-white/20 text-white/40 cursor-not-allowed'
                             : 'bg-white text-black shadow-2xl hover:opacity-90 transform hover:scale-105'
-                        } ${step === 9 ? 'shadow-yellow-400/50' : ''}`}
+                        } ${step === 8 ? 'shadow-yellow-400/50' : ''}`}
                     >
-                        {step === 9 ? '☀️ Illuminate Your Universe' : 'Journey Onward'}
+                        {step === 8 ? '☀️ Illuminate Your Universe' : 'Journey Onward'}
                     </button>
-                    {isContinueDisabled() && step === 9 && (
+                    {isContinueDisabled() && step === 8 && (
                         <p className="text-center text-white/50 text-xs mt-3">
                             Fill in all fields to continue (name 2+ chars, valid email, password 8+ chars)
                         </p>
