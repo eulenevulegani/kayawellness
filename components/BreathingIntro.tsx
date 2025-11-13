@@ -68,10 +68,19 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
 
   const getOrbScale = () => {
     switch (breathPhase) {
-      case 'inhale': return 'scale-150';
-      case 'hold': return 'scale-150';
-      case 'exhale': return 'scale-100';
-      case 'rest': return 'scale-100';
+      case 'inhale': return 1.5;
+      case 'hold': return 1.5;
+      case 'exhale': return 1.0;
+      case 'rest': return 1.0;
+    }
+  };
+
+  const getTransitionDuration = () => {
+    switch (breathPhase) {
+      case 'inhale': return 4000;
+      case 'exhale': return 6000;
+      case 'hold': return 2000;
+      case 'rest': return 2000;
     }
   };
 
@@ -124,7 +133,13 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
 
           {/* Breathing Orb */}
           <div className="flex justify-center">
-            <div className={`relative w-40 h-40 rounded-full transition-transform duration-[${breathPhase === 'inhale' ? '4000' : breathPhase === 'exhale' ? '6000' : '2000'}] ease-in-out ${getOrbScale()}`}>
+            <div 
+              className="relative w-40 h-40 rounded-full ease-in-out"
+              style={{
+                transform: `scale(${getOrbScale()})`,
+                transition: `transform ${getTransitionDuration()}ms ease-in-out`
+              }}
+            >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 shadow-[0_0_100px_rgba(6,182,212,0.8)]">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 rounded-full bg-white/90 blur-lg animate-core-pulse" />
