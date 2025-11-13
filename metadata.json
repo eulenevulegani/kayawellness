@@ -1,0 +1,7 @@
+{
+  "name": "KAYA: The Modern Wellness Buddy",
+  "description": "KAYA is a next-generation digital wellness companion — a personalized guide that blends emotional intelligence and AI-driven curation to create mood-based, immersive wellness experiences.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

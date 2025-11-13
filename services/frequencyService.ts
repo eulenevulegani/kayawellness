@@ -1,0 +1,444 @@
+/**
+ * Sound Frequency Service
+ * Therapeutic sound frequencies mapped to specific wellness concerns
+ * Based on sound healing principles and binaural beat therapy
+ */
+
+export interface FrequencyProfile {
+  name: string;
+  baseFrequency: number; // Hz
+  binauralBeat?: number; // Hz difference for binaural beats
+  waveType: 'sine' | 'triangle' | 'square' | 'sawtooth';
+  description: string;
+  benefits: string[];
+}
+
+export interface SoundscapeConfig {
+  concern: string;
+  frequencies: FrequencyProfile[];
+  ambientLayers?: {
+    type: 'nature' | 'white-noise' | 'brown-noise' | 'pink-noise';
+    volume: number; // 0-1
+  }[];
+  duration: number; // minutes
+}
+
+/**
+ * Therapeutic Frequencies Database
+ * Based on Solfeggio frequencies, Schumann resonance, and binaural beat research
+ */
+export const THERAPEUTIC_FREQUENCIES: Record<string, FrequencyProfile[]> = {
+  // Anxiety & Stress Relief
+  anxiety: [
+    {
+      name: 'Alpha Waves',
+      baseFrequency: 10, // 8-13 Hz Alpha range
+      binauralBeat: 10,
+      waveType: 'sine',
+      description: 'Promotes relaxation and reduces anxiety',
+      benefits: ['Reduces cortisol', 'Calms nervous system', 'Promotes present moment awareness']
+    },
+    {
+      name: 'Schumann Resonance',
+      baseFrequency: 7.83, // Earth's natural frequency
+      waveType: 'sine',
+      description: 'Grounding frequency that synchronizes with Earth',
+      benefits: ['Grounding', 'Stress reduction', 'Improved focus']
+    },
+    {
+      name: '432 Hz - Natural Harmony',
+      baseFrequency: 432,
+      waveType: 'sine',
+      description: 'Natural tuning frequency, deeply calming',
+      benefits: ['Reduces anxiety', 'Heart coherence', 'Mental clarity']
+    }
+  ],
+
+  // Sleep & Insomnia
+  sleep: [
+    {
+      name: 'Delta Waves',
+      baseFrequency: 2, // 0.5-4 Hz Delta range
+      binauralBeat: 2,
+      waveType: 'sine',
+      description: 'Deep sleep brainwave frequency',
+      benefits: ['Induces deep sleep', 'Physical restoration', 'Healing']
+    },
+    {
+      name: 'Theta Waves',
+      baseFrequency: 6, // 4-8 Hz Theta range
+      binauralBeat: 6,
+      waveType: 'sine',
+      description: 'Light sleep and deep meditation',
+      benefits: ['Promotes drowsiness', 'REM sleep', 'Dream states']
+    },
+    {
+      name: '174 Hz - Pain Relief',
+      baseFrequency: 174,
+      waveType: 'sine',
+      description: 'Solfeggio frequency for physical comfort',
+      benefits: ['Physical relaxation', 'Pain reduction', 'Security']
+    }
+  ],
+
+  // Focus & Concentration
+  focus: [
+    {
+      name: 'Beta Waves',
+      baseFrequency: 18, // 13-30 Hz Beta range
+      binauralBeat: 18,
+      waveType: 'sine',
+      description: 'Alert, focused mental state',
+      benefits: ['Enhanced focus', 'Mental clarity', 'Active thinking']
+    },
+    {
+      name: 'Gamma Waves',
+      baseFrequency: 40, // 30-100 Hz Gamma range
+      binauralBeat: 40,
+      waveType: 'sine',
+      description: 'Peak cognitive performance',
+      benefits: ['Peak focus', 'Information processing', 'Learning']
+    },
+    {
+      name: '963 Hz - Crown Chakra',
+      baseFrequency: 963,
+      waveType: 'sine',
+      description: 'Awakening intuition and consciousness',
+      benefits: ['Mental clarity', 'Spiritual connection', 'Higher consciousness']
+    }
+  ],
+
+  // Depression & Mood Enhancement
+  depression: [
+    {
+      name: '528 Hz - Love Frequency',
+      baseFrequency: 528,
+      waveType: 'sine',
+      description: 'DNA repair and transformation frequency',
+      benefits: ['Mood elevation', 'Emotional healing', 'Positive energy']
+    },
+    {
+      name: 'Alpha-Theta Bridge',
+      baseFrequency: 10,
+      binauralBeat: 8,
+      waveType: 'sine',
+      description: 'Emotional processing and release',
+      benefits: ['Emotional balance', 'Creativity', 'Inner peace']
+    },
+    {
+      name: '396 Hz - Liberation',
+      baseFrequency: 396,
+      waveType: 'sine',
+      description: 'Liberating guilt and fear',
+      benefits: ['Releases negative emotions', 'Grounding', 'Confidence']
+    }
+  ],
+
+  // Meditation & Mindfulness
+  meditation: [
+    {
+      name: 'Theta Waves',
+      baseFrequency: 6,
+      binauralBeat: 6,
+      waveType: 'sine',
+      description: 'Deep meditation state',
+      benefits: ['Deep meditation', 'Intuition', 'Subconscious access']
+    },
+    {
+      name: '852 Hz - Third Eye',
+      baseFrequency: 852,
+      waveType: 'sine',
+      description: 'Spiritual awakening and intuition',
+      benefits: ['Intuition', 'Inner wisdom', 'Spiritual insight']
+    },
+    {
+      name: 'Om Frequency',
+      baseFrequency: 136.1, // Cosmic Om
+      waveType: 'sine',
+      description: 'Universal sound of creation',
+      benefits: ['Deep meditation', 'Spiritual connection', 'Universal harmony']
+    }
+  ],
+
+  // Pain & Physical Healing
+  pain: [
+    {
+      name: '174 Hz - Foundation',
+      baseFrequency: 174,
+      waveType: 'sine',
+      description: 'Physical foundation and pain relief',
+      benefits: ['Pain reduction', 'Physical comfort', 'Grounding']
+    },
+    {
+      name: '285 Hz - Tissue Healing',
+      baseFrequency: 285,
+      waveType: 'sine',
+      description: 'Cellular regeneration',
+      benefits: ['Tissue repair', 'Energy field restoration', 'Physical healing']
+    },
+    {
+      name: 'Delta Waves',
+      baseFrequency: 2,
+      binauralBeat: 2,
+      waveType: 'sine',
+      description: 'Deep healing and restoration',
+      benefits: ['Physical healing', 'Deep relaxation', 'Pain management']
+    }
+  ],
+
+  // Energy & Vitality
+  energy: [
+    {
+      name: 'Beta Waves',
+      baseFrequency: 20,
+      binauralBeat: 20,
+      waveType: 'sine',
+      description: 'Alert, energized state',
+      benefits: ['Increased energy', 'Alertness', 'Motivation']
+    },
+    {
+      name: '741 Hz - Expression',
+      baseFrequency: 741,
+      waveType: 'sine',
+      description: 'Awakening intuition and expression',
+      benefits: ['Mental energy', 'Self-expression', 'Problem solving']
+    },
+    {
+      name: 'Gamma Waves',
+      baseFrequency: 40,
+      binauralBeat: 40,
+      waveType: 'sine',
+      description: 'Peak performance state',
+      benefits: ['Peak energy', 'Cognitive enhancement', 'Vitality']
+    }
+  ],
+
+  // Heart & Emotional Healing
+  heartHealing: [
+    {
+      name: '639 Hz - Connection',
+      baseFrequency: 639,
+      waveType: 'sine',
+      description: 'Heart chakra and relationships',
+      benefits: ['Emotional healing', 'Compassion', 'Connection']
+    },
+    {
+      name: '528 Hz - Love',
+      baseFrequency: 528,
+      waveType: 'sine',
+      description: 'Miracle frequency for transformation',
+      benefits: ['Love', 'Compassion', 'DNA repair']
+    },
+    {
+      name: 'Alpha Waves',
+      baseFrequency: 10,
+      binauralBeat: 10,
+      waveType: 'sine',
+      description: 'Emotional balance',
+      benefits: ['Emotional stability', 'Self-love', 'Inner peace']
+    }
+  ]
+};
+
+/**
+ * Map user goals/concerns to frequency profiles
+ */
+export function getFrequenciesForConcern(concern: string): FrequencyProfile[] {
+  const concernMap: Record<string, string> = {
+    'manage stress': 'anxiety',
+    'manage anxiety': 'anxiety',
+    'improve sleep': 'sleep',
+    'increase focus': 'focus',
+    'overcome depression': 'depression',
+    'build resilience': 'heartHealing',
+    'manage relationships': 'heartHealing',
+    'work-life balance': 'anxiety',
+    'practice gratitude': 'meditation',
+    'build self-esteem': 'heartHealing',
+    'process anxiety': 'anxiety'
+  };
+
+  const concernKey = concernMap[concern.toLowerCase()] || 'meditation';
+  return THERAPEUTIC_FREQUENCIES[concernKey] || THERAPEUTIC_FREQUENCIES.meditation;
+}
+
+/**
+ * Generate soundscape configuration based on user profile
+ */
+export function generateSoundscapeConfig(
+  concerns: string[],
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night',
+  duration: number = 10
+): SoundscapeConfig {
+  // Primary concern determines base frequencies
+  const primaryConcern = concerns[0] || 'meditation';
+  const frequencies = getFrequenciesForConcern(primaryConcern);
+
+  // Time of day influences ambient layers
+  let ambientLayers: SoundscapeConfig['ambientLayers'] = [];
+
+  switch (timeOfDay) {
+    case 'morning':
+      ambientLayers = [
+        { type: 'nature', volume: 0.3 }, // Birds, morning sounds
+        { type: 'white-noise', volume: 0.1 } // Gentle clarity
+      ];
+      break;
+    case 'afternoon':
+      ambientLayers = [
+        { type: 'pink-noise', volume: 0.2 }, // Balanced, calming
+        { type: 'nature', volume: 0.2 } // Subtle nature sounds
+      ];
+      break;
+    case 'evening':
+      ambientLayers = [
+        { type: 'brown-noise', volume: 0.3 }, // Deep, relaxing
+        { type: 'nature', volume: 0.2 } // Evening crickets, gentle wind
+      ];
+      break;
+    case 'night':
+      ambientLayers = [
+        { type: 'brown-noise', volume: 0.4 }, // Deep sleep support
+        { type: 'nature', volume: 0.1 } // Very subtle night sounds
+      ];
+      break;
+  }
+
+  return {
+    concern: primaryConcern,
+    frequencies,
+    ambientLayers,
+    duration
+  };
+}
+
+/**
+ * Web Audio API implementation for generating therapeutic frequencies
+ */
+export class FrequencyGenerator {
+  private audioContext: AudioContext | null = null;
+  private oscillators: OscillatorNode[] = [];
+  private gainNodes: GainNode[] = [];
+  private isPlaying: boolean = false;
+
+  constructor() {
+    if (typeof window !== 'undefined' && ('AudioContext' in window || 'webkitAudioContext' in window)) {
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+  }
+
+  /**
+   * Play a frequency profile
+   */
+  play(profile: FrequencyProfile, volume: number = 0.3): void {
+    if (!this.audioContext) {
+      console.warn('Web Audio API not supported');
+      return;
+    }
+
+    // Resume audio context if suspended (browser autoplay policy)
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
+
+    const gainNode = this.audioContext.createGain();
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 2); // 2s fade in
+    gainNode.connect(this.audioContext.destination);
+
+    // Base frequency oscillator
+    const baseOsc = this.audioContext.createOscillator();
+    baseOsc.type = profile.waveType;
+    baseOsc.frequency.setValueAtTime(profile.baseFrequency, this.audioContext.currentTime);
+    baseOsc.connect(gainNode);
+    baseOsc.start();
+
+    this.oscillators.push(baseOsc);
+    this.gainNodes.push(gainNode);
+
+    // Binaural beat (if specified) - requires stereo
+    if (profile.binauralBeat) {
+      const leftGain = this.audioContext.createGain();
+      const rightGain = this.audioContext.createGain();
+      const merger = this.audioContext.createChannelMerger(2);
+
+      leftGain.gain.setValueAtTime(volume * 0.5, this.audioContext.currentTime);
+      rightGain.gain.setValueAtTime(volume * 0.5, this.audioContext.currentTime);
+
+      // Left ear - base frequency
+      const leftOsc = this.audioContext.createOscillator();
+      leftOsc.type = profile.waveType;
+      leftOsc.frequency.setValueAtTime(profile.baseFrequency, this.audioContext.currentTime);
+      leftOsc.connect(leftGain);
+      leftGain.connect(merger, 0, 0);
+
+      // Right ear - base frequency + binaural beat
+      const rightOsc = this.audioContext.createOscillator();
+      rightOsc.type = profile.waveType;
+      rightOsc.frequency.setValueAtTime(
+        profile.baseFrequency + profile.binauralBeat,
+        this.audioContext.currentTime
+      );
+      rightOsc.connect(rightGain);
+      rightGain.connect(merger, 0, 1);
+
+      merger.connect(this.audioContext.destination);
+
+      leftOsc.start();
+      rightOsc.start();
+
+      this.oscillators.push(leftOsc, rightOsc);
+      this.gainNodes.push(leftGain, rightGain);
+    }
+
+    this.isPlaying = true;
+  }
+
+  /**
+   * Stop all frequencies
+   */
+  stop(): void {
+    if (!this.audioContext) return;
+
+    // Fade out
+    this.gainNodes.forEach(gain => {
+      gain.gain.linearRampToValueAtTime(0, this.audioContext!.currentTime + 2);
+    });
+
+    // Stop oscillators after fade
+    setTimeout(() => {
+      this.oscillators.forEach(osc => {
+        try {
+          osc.stop();
+        } catch (e) {
+          // Already stopped
+        }
+      });
+      this.oscillators = [];
+      this.gainNodes = [];
+      this.isPlaying = false;
+    }, 2100);
+  }
+
+  /**
+   * Play multiple frequencies simultaneously (soundscape)
+   */
+  playSoundscape(config: SoundscapeConfig): void {
+    // Play up to 3 frequencies for a rich soundscape
+    const frequenciesToPlay = config.frequencies.slice(0, 3);
+    const volumePerFreq = 0.2 / frequenciesToPlay.length; // Distribute volume
+
+    frequenciesToPlay.forEach((freq, index) => {
+      setTimeout(() => {
+        this.play(freq, volumePerFreq);
+      }, index * 500); // Stagger start for smoother blend
+    });
+  }
+
+  getIsPlaying(): boolean {
+    return this.isPlaying;
+  }
+}
+
+export const frequencyGenerator = new FrequencyGenerator();
+export default frequencyGenerator;

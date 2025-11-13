@@ -1,0 +1,768 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+  ENTERPRISE
+}
+
+enum SessionLength {
+  SHORT
+  MEDIUM
+  LONG
+}
+
+enum Lifestyle {
+  SEDENTARY
+  ACTIVE
+  BALANCED
+}
+
+enum CheckInTime {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
+enum ActivityType {
+  MEDITATION
+  BREATHWORK
+  SOUNDSCAPE
+  SLEEP_STORY
+  AFFIRMATION
+}
+
+enum ChallengeType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  MILESTONE
+}
+
+enum ChallengeStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  LOCKED
+}
+
+enum RewardCategory {
+  WELLNESS_PRODUCT
+  SELF_CARE
+  EXPERIENCE
+  DISCOUNT_COUPON
+  PREMIUM_FEATURE
+}
+
+enum RedemptionStatus {
+  PENDING
+  APPROVED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum EventCategory {
+  WORKSHOP
+  MEDITATION
+  YOGA
+  SUPPORT_GROUP
+  RETREAT
+  WEBINAR
+  FITNESS
+}
+
+enum TherapistAvailability {
+  ACCEPTING
+  WAITLIST
+  FULL
+}
+
+model User {
+  id                    String              @id @default(uuid())
+  email                 String              @unique
+  passwordHash          String
+  name                  String
+  profilePicture        String?
+  bio                   String?
+  
+  // Wellness profile
+  sessionLength         SessionLength       @default(MEDIUM)
+  goals                 String[]
+  checkInTimes          CheckInTime[]
+  lifestyle             Lifestyle           @default(BALANCED)
+  subscriptionTier      SubscriptionTier    @default(FREE)
+  
+  // Progress tracking
+  xp                    Int                 @default(0)
+  level                 Int                 @default(1)
+  streak                Int                 @default(0)
+  lastSessionDate       DateTime?
+  totalSessionsCompleted Int                @default(0)
+  totalMinutesMeditated Int                @default(0)
+  
+  // Preferences
+  supportPreferences    String[]
+  experienceLevel       String?
+  city                  String?
+  state                 String?
+  zipCode               String?
+  
+  // Notifications
+  notificationsEnabled  Boolean             @default(true)
+  checkInReminders      Boolean             @default(true)
+  streakProtection      Boolean             @default(true)
+  milestoneAlerts       Boolean             @default(true)
+  challengeUpdates      Boolean             @default(true)
+  therapistQA           Boolean             @default(true)
+  calendarSync          Boolean             @default(false)
+  quietHoursStart       String?
+  quietHoursEnd         String?
+  wakeTime              String?             // Morning wellness wake time (HH:MM format)
+  morningWellnessEnabled Boolean            @default(false)
+  
+  // Subscription
+  stripeCustomerId      String?             @unique
+  stripeSubscriptionId  String?
+  subscriptionEndDate   DateTime?
+  
+  // Security
+  emailVerified         Boolean             @default(false)
+  emailVerificationToken String?
+  passwordResetToken    String?
+  passwordResetExpires  DateTime?
+  refreshTokens         RefreshToken[]
+  
+  // Relationships
+  sessions              Session[]
+  programEnrollments    ProgramEnrollment[]
+  achievements          UserAchievement[]
+  journalEntries        JournalEntry[]
+  gratitudeEntries      GratitudeEntry[]
+  moodEntries           MoodEntry[]
+  communityPosts        CommunityPost[]
+  postLikes             PostLike[]
+  comments              Comment[]
+  eventRegistrations    EventRegistration[]
+  therapistBookings     TherapistBooking[]
+  supportGroupMemberships SupportGroupMember[]
+  challengeParticipants ChallengeParticipant[]
+  notifications         Notification[]
+  
+  // Gamification
+  userPoints            UserPoints?
+  streaks               Streak[]
+  userChallenges        UserChallenge[]
+  redemptions           Redemption[]
+  leaderboardEntries    Leaderboard[]
+  
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  lastLoginAt           DateTime?
+  
+  @@index([email])
+  @@index([subscriptionTier])
+  @@index([level])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+}
+
+model Session {
+  id                String        @id @default(uuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  activityType      ActivityType
+  title             String
+  description       String?
+  durationMinutes   Int
+  
+  // Content
+  scriptContent     String?       @db.Text
+  breathPattern     Json?
+  soundscapeData    Json?
+  affirmationText   String?
+  
+  // Completion data
+  completed         Boolean       @default(false)
+  completedAt       DateTime?
+  mood              String?
+  reflection        String?       @db.Text
+  rating            Int?          // 1-5 stars
+  
+  // XP earned from this session
+  xpEarned          Int           @default(0)
+  
+  // Program association
+  programEnrollmentId String?
+  programEnrollment ProgramEnrollment? @relation(fields: [programEnrollmentId], references: [id])
+  programDay        Int?
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  @@index([userId])
+  @@index([completed])
+  @@index([createdAt])
+}
+
+model WellnessProgram {
+  id              String              @id @default(uuid())
+  title           String
+  description     String              @db.Text
+  duration        Int                 // number of days
+  dailyThemes     String[]
+  imageUrl        String?
+  category        String
+  difficulty      String              @default("beginner")
+  subscriptionTier SubscriptionTier   @default(FREE)
+  
+  isPublished     Boolean             @default(true)
+  enrollments     ProgramEnrollment[]
+  
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  
+  @@index([category])
+  @@index([subscriptionTier])
+}
+
+model ProgramEnrollment {
+  id                String           @id @default(uuid())
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId         String
+  program           WellnessProgram  @relation(fields: [programId], references: [id])
+  
+  currentDay        Int              @default(0)
+  completed         Boolean          @default(false)
+  completedAt       DateTime?
+  
+  sessions          Session[]
+  
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  @@unique([userId, programId])
+  @@index([userId])
+  @@index([programId])
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  title       String
+  description String
+  iconUrl     String?
+  xpReward    Int               @default(0)
+  category    String
+  tier        String            @default("bronze") // bronze, silver, gold, platinum
+  
+  // Unlock criteria
+  requiredSessions  Int?
+  requiredStreak    Int?
+  requiredXP        Int?
+  requiredLevel     Int?
+  
+  users       UserAchievement[]
+  
+  createdAt   DateTime          @default(now())
+  
+  @@index([category])
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  
+  unlockedAt    DateTime    @default(now())
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model JournalEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String?
+  content   String   @db.Text
+  mood      String?
+  tags      String[]
+  isPrivate Boolean  @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model GratitudeEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  word      String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model MoodEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  mood      String
+  intensity Int      // 1-10
+  notes     String?  @db.Text
+  triggers  String[]
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model CommunityPost {
+  id            String     @id @default(uuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content       String     @db.Text
+  imageUrl      String?
+  category      String
+  isAnonymous   Boolean    @default(false)
+  isPinned      Boolean    @default(false)
+  
+  likes         PostLike[]
+  comments      Comment[]
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  @@index([userId])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model PostLike {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime      @default(now())
+  
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Comment {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  content   String        @db.Text
+  isAnonymous Boolean     @default(false)
+  
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  @@index([postId])
+  @@index([userId])
+}
+
+model WellnessEvent {
+  id              String              @id @default(uuid())
+  title           String
+  description     String              @db.Text
+  category        EventCategory
+  
+  date            DateTime
+  time            String
+  durationMinutes Int
+  
+  isVirtual       Boolean             @default(false)
+  location        String?
+  meetingLink     String?
+  
+  maxAttendees    Int?
+  imageUrl        String?
+  
+  hostName        String
+  hostBio         String?
+  
+  registrations   EventRegistration[]
+  
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  
+  @@index([date])
+  @@index([category])
+}
+
+model EventRegistration {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   String
+  event     WellnessEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  attended  Boolean       @default(false)
+  
+  createdAt DateTime      @default(now())
+  
+  @@unique([userId, eventId])
+  @@index([eventId])
+}
+
+model Therapist {
+  id                  String                @id @default(uuid())
+  name                String
+  title               String
+  email               String                @unique
+  phone               String?
+  bio                 String                @db.Text
+  profilePicture      String?
+  
+  specializations     String[]
+  approach            String[]
+  languages           String[]
+  
+  experience          Int                   // years
+  availability        TherapistAvailability @default(ACCEPTING)
+  
+  acceptsInsurance    Boolean               @default(false)
+  virtualSessions     Boolean               @default(true)
+  inPersonSessions    Boolean               @default(false)
+  
+  city                String?
+  state               String?
+  
+  rating              Float                 @default(0)
+  reviewCount         Int                   @default(0)
+  
+  isVerified          Boolean               @default(false)
+  
+  bookings            TherapistBooking[]
+  
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  
+  @@index([availability])
+  @@index([city, state])
+}
+
+model TherapistBooking {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  therapistId String
+  therapist   Therapist @relation(fields: [therapistId], references: [id])
+  
+  scheduledAt DateTime
+  notes       String?   @db.Text
+  status      String    @default("pending") // pending, confirmed, completed, cancelled
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([therapistId])
+  @@index([scheduledAt])
+}
+
+model SupportGroup {
+  id          String              @id @default(uuid())
+  name        String
+  description String              @db.Text
+  category    String
+  imageUrl    String?
+  
+  isPrivate   Boolean             @default(false)
+  maxMembers  Int?
+  
+  members     SupportGroupMember[]
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  @@index([category])
+}
+
+model SupportGroupMember {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupId   String
+  group     SupportGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  
+  role      String       @default("member") // member, moderator, admin
+  joinedAt  DateTime     @default(now())
+  
+  @@unique([userId, groupId])
+  @@index([groupId])
+}
+
+model Challenge {
+  id           String                 @id @default(uuid())
+  title        String
+  description  String                 @db.Text
+  category     String
+  
+  startDate    DateTime
+  endDate      DateTime
+  
+  goal         Int                    // target value (e.g., 30 sessions)
+  goalType     String                 // sessions, minutes, streak_days
+  
+  rewardXP     Int                    @default(0)
+  
+  participants ChallengeParticipant[]
+  userChallenges UserChallenge[]
+  
+  createdAt    DateTime               @default(now())
+  
+  @@index([startDate, endDate])
+  @@index([category])
+}
+
+model ChallengeParticipant {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  
+  progress    Int       @default(0)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  
+  joinedAt    DateTime  @default(now())
+  
+  @@unique([userId, challengeId])
+  @@index([challengeId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String   // achievement, streak, reminder, social, system
+  title     String
+  message   String   @db.Text
+  actionUrl String?
+  
+  isRead    Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ============================================
+// GAMIFICATION MODELS
+// ============================================
+
+model UserPoints {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  totalPoints       Int      @default(0)
+  availablePoints   Int      @default(0) // Points not yet redeemed
+  lifetimeEarned    Int      @default(0)
+  lifetimeSpent     Int      @default(0)
+  currentStreak     Int      @default(0)
+  longestStreak     Int      @default(0)
+  lastCheckIn       DateTime?
+  
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions      PointTransaction[]
+  challenges        UserChallenge[]
+  redemptions       Redemption[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([totalPoints])
+  @@index([currentStreak])
+}
+
+model PointTransaction {
+  id            String      @id @default(uuid())
+  userId        String
+  userPointsId  String
+  points        Int         // Positive for earning, negative for spending
+  reason        String
+  description   String?
+  metadata      Json?       // Extra info like sessionId, challengeId, etc.
+  
+  userPoints    UserPoints  @relation(fields: [userPointsId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime    @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([reason])
+}
+
+model Streak {
+  id                String   @id @default(uuid())
+  userId            String
+  streakCount       Int      @default(0)
+  lastCheckInDate   DateTime
+  streakStartDate   DateTime
+  isBroken          Boolean  @default(false)
+  streakBonusPoints Int      @default(0)
+  milestones        Json?    // Array of milestone days achieved [7, 14, 30, 60, 100, 365]
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([streakCount])
+  @@index([lastCheckInDate])
+}
+
+model UserChallenge {
+  id              String          @id @default(uuid())
+  userId          String
+  challengeId     String
+  userPointsId    String
+  status          ChallengeStatus @default(ACTIVE)
+  progress        Int             @default(0)
+  completedAt     DateTime?
+  pointsEarned    Int             @default(0)
+  
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge       Challenge       @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userPoints      UserPoints      @relation(fields: [userPointsId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@unique([userId, challengeId])
+  @@index([userId])
+  @@index([status])
+  @@index([challengeId])
+}
+
+model Reward {
+  id              String          @id @default(uuid())
+  title           String
+  description     String
+  category        RewardCategory
+  brand           String          // Partner brand name
+  pointCost       Int
+  stockQuantity   Int?            // null = unlimited
+  imageUrl        String?
+  terms           String?         // Terms and conditions
+  expiryDate      DateTime?
+  isActive        Boolean         @default(true)
+  isFeatured      Boolean         @default(false)
+  redemptionLimit Int?            // Max redemptions per user
+  metadata        Json?           // Coupon codes, product details, etc.
+  
+  redemptions     Redemption[]
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@index([category])
+  @@index([isActive])
+  @@index([pointCost])
+}
+
+model Redemption {
+  id              String            @id @default(uuid())
+  userId          String
+  rewardId        String
+  userPointsId    String
+  pointsSpent     Int
+  status          RedemptionStatus  @default(PENDING)
+  shippingAddress Json?             // Address details
+  trackingNumber  String?
+  couponCode      String?           // Generated unique code
+  notes           String?
+  
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward          Reward            @relation(fields: [rewardId], references: [id])
+  userPoints      UserPoints        @relation(fields: [userPointsId], references: [id], onDelete: Cascade)
+  
+  redeemedAt      DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  @@index([userId])
+  @@index([rewardId])
+  @@index([status])
+}
+
+model Leaderboard {
+  id              String   @id @default(uuid())
+  userId          String
+  username        String
+  totalPoints     Int
+  currentStreak   Int
+  rank            Int
+  timeframe       String   // DAILY, WEEKLY, MONTHLY, ALL_TIME
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([userId, timeframe])
+  @@index([timeframe, rank])
+  @@index([totalPoints])
+}

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Redis Cache (Optional - can use Upstash instead)
+  redis:
+    image: redis:7-alpine
+    container_name: kaya-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kaya-api
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+volumes:
+  redis_data:
