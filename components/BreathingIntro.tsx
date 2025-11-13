@@ -5,10 +5,7 @@ interface BreathingIntroProps {
 }
 
 const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
-    // Sound frequency oscillator state
-    const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
-    const [oscillator, setOscillator] = useState<OscillatorNode | null>(null);
-    const FREQUENCY = 432; // Hz (can change to 528, 396, etc.)
+    // Removed all sound/oscillator logic for a silent breathing session
   const [phase, setPhase] = useState<'intro' | 'breathing' | 'complete'>('intro');
   const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale' | 'rest'>('inhale');
   const [cycleCount, setCycleCount] = useState(0);
@@ -17,42 +14,7 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
   const totalCycles = 3;
 
   useEffect(() => {
-    if (phase !== 'breathing') {
-      // Cleanup: stop oscillator when phase changes away from breathing
-      if (oscillator) {
-        try {
-          oscillator.stop();
-          oscillator.disconnect();
-        } catch {}
-        setOscillator(null);
-      }
-      if (audioCtx) {
-        try {
-          audioCtx.close();
-        } catch {}
-        setAudioCtx(null);
-      }
-      return;
-    }
-
-    // Start oscillator on breathing phase
-    if (!audioCtx) {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      setAudioCtx(ctx);
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = FREQUENCY;
-      osc.connect(ctx.destination);
-      osc.start();
-      setOscillator(osc);
-    } else if (!oscillator) {
-      const osc = audioCtx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = FREQUENCY;
-      osc.connect(audioCtx.destination);
-      osc.start();
-      setOscillator(osc);
-    }
+    if (phase !== 'breathing') return;
 
     const breathingSequence = [
       { phase: 'inhale', duration: 4000 },
@@ -85,23 +47,9 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
     };
 
     runBreathingCycle();
-    // Cleanup: stop oscillator when phase changes
-    return () => {
-      if (oscillator) {
-        try {
-          oscillator.stop();
-          oscillator.disconnect();
-        } catch {}
-        setOscillator(null);
-      }
-      if (audioCtx) {
-        try {
-          audioCtx.close();
-        } catch {}
-        setAudioCtx(null);
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // No sound or oscillator to clean up
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
   const feelings = [
@@ -158,15 +106,6 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
             </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extralight text-white">
-            Welcome to Your Calm Universe
-          </h1>
-          
-          <p className="text-lg text-white/70 max-w-lg mx-auto font-light">
-            Before we begin, let's take a moment together.<br/>
-            A simple breathing exercise to center yourself.
-          </p>
-
           <button
             onClick={() => setPhase('breathing')}
             className="px-12 py-4 bg-white text-black rounded-full font-semibold text-lg hover:bg-white/90 transform hover:scale-105 transition-all duration-300 shadow-2xl"
@@ -215,6 +154,16 @@ const BreathingIntro: React.FC<BreathingIntroProps> = ({ onComplete }) => {
             <p className="text-white/50 text-sm">
               Follow the orb as it expands and contracts
             </p>
+          </div>
+
+          {/* Skip Button */}
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={() => onComplete('skipped')}
+              className="px-8 py-3 bg-transparent border border-white/40 text-white rounded-full font-semibold text-lg hover:bg-white/10 hover:border-white/60 transition-all duration-300"
+            >
+              Skip
+            </button>
           </div>
         </div>
       </div>

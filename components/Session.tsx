@@ -92,10 +92,11 @@ const ActivityPlayer: React.FC<ActivityPlayerProps> = ({ activity, onClose }) =>
       case 'meditation':
         return <MeditationPlayer script={activity.data.script} title={activity.data.title} />;
       case 'breathwork':
+        // Always use BreathworkAnimator for all breathwork activities
         return (
             <div className="flex flex-col items-center text-center space-y-8 w-full max-w-2xl">
                  <h2 className="text-2xl font-light text-white/90 tracking-wide">{activity.data.title}</h2>
-                <BreathworkAnimator breathwork={activity.data} />
+                <BreathworkAnimator breathwork={activity.data} variant="standard" />
             </div>
         );
       case 'soundscape':

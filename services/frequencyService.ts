@@ -331,67 +331,8 @@ export class FrequencyGenerator {
    * Play a frequency profile
    */
   play(profile: FrequencyProfile, volume: number = 0.3): void {
-    if (!this.audioContext) {
-      console.warn('Web Audio API not supported');
-      return;
-    }
-
-    // Resume audio context if suspended (browser autoplay policy)
-    if (this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
-    }
-
-    const gainNode = this.audioContext.createGain();
-    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 2); // 2s fade in
-    gainNode.connect(this.audioContext.destination);
-
-    // Base frequency oscillator
-    const baseOsc = this.audioContext.createOscillator();
-    baseOsc.type = profile.waveType;
-    baseOsc.frequency.setValueAtTime(profile.baseFrequency, this.audioContext.currentTime);
-    baseOsc.connect(gainNode);
-    baseOsc.start();
-
-    this.oscillators.push(baseOsc);
-    this.gainNodes.push(gainNode);
-
-    // Binaural beat (if specified) - requires stereo
-    if (profile.binauralBeat) {
-      const leftGain = this.audioContext.createGain();
-      const rightGain = this.audioContext.createGain();
-      const merger = this.audioContext.createChannelMerger(2);
-
-      leftGain.gain.setValueAtTime(volume * 0.5, this.audioContext.currentTime);
-      rightGain.gain.setValueAtTime(volume * 0.5, this.audioContext.currentTime);
-
-      // Left ear - base frequency
-      const leftOsc = this.audioContext.createOscillator();
-      leftOsc.type = profile.waveType;
-      leftOsc.frequency.setValueAtTime(profile.baseFrequency, this.audioContext.currentTime);
-      leftOsc.connect(leftGain);
-      leftGain.connect(merger, 0, 0);
-
-      // Right ear - base frequency + binaural beat
-      const rightOsc = this.audioContext.createOscillator();
-      rightOsc.type = profile.waveType;
-      rightOsc.frequency.setValueAtTime(
-        profile.baseFrequency + profile.binauralBeat,
-        this.audioContext.currentTime
-      );
-      rightOsc.connect(rightGain);
-      rightGain.connect(merger, 0, 1);
-
-      merger.connect(this.audioContext.destination);
-
-      leftOsc.start();
-      rightOsc.start();
-
-      this.oscillators.push(leftOsc, rightOsc);
-      this.gainNodes.push(leftGain, rightGain);
-    }
-
-    this.isPlaying = true;
+    // Disabled: No sound will be played
+    this.isPlaying = false;
   }
 
   /**
@@ -424,15 +365,8 @@ export class FrequencyGenerator {
    * Play multiple frequencies simultaneously (soundscape)
    */
   playSoundscape(config: SoundscapeConfig): void {
-    // Play up to 3 frequencies for a rich soundscape
-    const frequenciesToPlay = config.frequencies.slice(0, 3);
-    const volumePerFreq = 0.2 / frequenciesToPlay.length; // Distribute volume
-
-    frequenciesToPlay.forEach((freq, index) => {
-      setTimeout(() => {
-        this.play(freq, volumePerFreq);
-      }, index * 500); // Stagger start for smoother blend
-    });
+    // Disabled: No sound will be played
+    this.isPlaying = false;
   }
 
   getIsPlaying(): boolean {

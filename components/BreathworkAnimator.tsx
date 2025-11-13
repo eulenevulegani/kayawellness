@@ -1,215 +1,165 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BreathworkItem } from '../types';
 
 interface BreathworkAnimatorProps {
   breathwork: BreathworkItem;
+  variant?: 'standard' | 'compact';
 }
 
-type Stage = 'inhale' | 'hold' | 'exhale' | 'holdAfterExhale';
+const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork, variant = 'standard' }) => {
+  // Normalize pattern and durations (seconds)
+  const pattern = breathwork?.pattern || { inhale: 4, hold: 4, exhale: 4 };
+  const inhale = pattern.inhale || 4;
+  const hold = pattern.hold || 0;
+  const exhale = pattern.exhale || 4;
+  const holdAfter = pattern.holdAfterExhale || 0;
 
-const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) => {
-  const { pattern = { inhale: 4, hold: 4, exhale: 4 } } = breathwork || {};
-  const { inhale, hold, exhale, holdAfterExhale } = pattern;
-  const stages: { name: Stage; duration: number }[] = [
-    { name: 'inhale', duration: inhale * 1000 },
-    { name: 'hold', duration: hold * 1000 },
-    { name: 'exhale', duration: exhale * 1000 },
-  ];
-  if (holdAfterExhale && holdAfterExhale > 0) {
-    stages.push({ name: 'holdAfterExhale', duration: holdAfterExhale * 1000 });
-  }
+  const stages = useMemo(() => {
+    const s: { name: string; durationMs: number }[] = [];
+    s.push({ name: 'inhale', durationMs: inhale * 1000 });
+    if (hold && hold > 0) s.push({ name: 'hold', durationMs: hold * 1000 });
+    s.push({ name: 'exhale', durationMs: exhale * 1000 });
+    if (holdAfter && holdAfter > 0) s.push({ name: 'holdAfterExhale', durationMs: holdAfter * 1000 });
+    return s;
+  }, [inhale, hold, exhale, holdAfter]);
 
-  const [currentStageIndex, setCurrentStageIndex] = useState(0);
-  const [countdown, setCountdown] = useState(stages[0].duration / 1000);
-  const [progress, setProgress] = useState(0);
+  const [stageIndex, setStageIndex] = useState(0);
+  const [countdown, setCountdown] = useState(Math.ceil((stages[0]?.durationMs || 4000) / 1000));
 
-  // Stage transition timer
+  // Advance stage on timer and update countdown
   useEffect(() => {
-    const stageDuration = stages[currentStageIndex].duration;
-    setProgress(0);
-    
-    const stageTimer = setTimeout(() => {
-      setCurrentStageIndex((prevIndex) => (prevIndex + 1) % stages.length);
-    }, stageDuration);
+    if (!stages || stages.length === 0) return;
 
-    // Smooth progress for animation
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        const increment = 100 / (stageDuration / 100);
-        return Math.min(prev + increment, 100);
-      });
-    }, 100);
+    const current = stages[stageIndex];
+    setCountdown(Math.ceil(current.durationMs / 1000));
 
-    return () => {
-      clearTimeout(stageTimer);
-      clearInterval(progressInterval);
-    };
-  }, [currentStageIndex, stages]);
-
-  // Countdown timer
-  useEffect(() => {
-    const initialCount = stages[currentStageIndex].duration / 1000;
-    setCountdown(initialCount);
-    
-    const countdownInterval = setInterval(() => {
+    // Interval for countdown every second
+    const tick = setInterval(() => {
       setCountdown((prev) => {
-        const next = prev - 1;
-        return next >= 1 ? next : initialCount;
+        if (prev <= 1) return Math.ceil(current.durationMs / 1000);
+        return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(countdownInterval);
-  }, [currentStageIndex, stages]);
+    // Move to next stage after full duration
+    const t = setTimeout(() => {
+      setStageIndex((i) => (i + 1) % stages.length);
+    }, current.durationMs);
 
-  const currentStage = stages[currentStageIndex];
-  
-  const stageInfo: Record<Stage, { text: string; gradient: string; glowColor: string; scaleClass: string }> = {
-    inhale: { 
-      text: 'BREATHE IN', 
-      gradient: 'from-cyan-400/20 via-blue-500/20 to-teal-600/20',
-      glowColor: 'shadow-[0_0_40px_rgba(6,182,212,0.3),0_0_80px_rgba(59,130,246,0.2)]',
-      scaleClass: 'scale-110'
-    },
-    hold: { 
-      text: 'GENTLY HOLD', 
-      gradient: 'from-cyan-400/20 via-teal-500/20 to-cyan-600/20',
-      glowColor: 'shadow-[0_0_40px_rgba(6,182,212,0.3),0_0_80px_rgba(20,184,166,0.2)]',
-      scaleClass: 'scale-110'
-    },
-    exhale: { 
-      text: 'BREATHE OUT', 
-      gradient: 'from-blue-400/20 via-cyan-500/20 to-teal-600/20',
-      glowColor: 'shadow-[0_0_40px_rgba(34,211,238,0.3),0_0_80px_rgba(20,184,166,0.2)]',
-      scaleClass: 'scale-95'
-    },
-    holdAfterExhale: { 
-      text: 'REST HERE', 
-      gradient: 'from-teal-400/20 via-blue-500/20 to-cyan-600/20',
-      glowColor: 'shadow-[0_0_40px_rgba(20,184,166,0.3),0_0_80px_rgba(59,130,246,0.2)]',
-      scaleClass: 'scale-95'
-    },
+    return () => {
+      clearInterval(tick);
+      clearTimeout(t);
+    };
+  }, [stageIndex, stages]);
+
+  const current = stages[stageIndex] || stages[0];
+
+  // Visual sizing
+  const sizes = variant === 'standard'
+    ? { outer: 'w-64 h-64', main: 'w-44 h-44', core: 'w-12 h-12', inset8: 'inset-8', inset16: 'inset-16' }
+    : { outer: 'w-44 h-44', main: 'w-28 h-28', core: 'w-8 h-8', inset8: 'inset-6', inset16: 'inset-12' };
+
+
+  // Animation: smoothly animate orb scale over the stage duration
+  const [orbScale, setOrbScale] = useState(1);
+  useEffect(() => {
+    let start = performance.now();
+    let frame: number;
+    const duration = current?.durationMs || 1200;
+    const isInhale = current?.name === 'inhale';
+    const isExhale = current?.name === 'exhale';
+    const isHold = current?.name === 'hold' || current?.name === 'holdAfterExhale';
+    const startScale = isInhale ? 1 : isExhale ? 1.18 : orbScale;
+    const endScale = isInhale ? 1.18 : isExhale ? 1 : orbScale;
+
+    function animate(now: number) {
+      const elapsed = Math.min(now - start, duration);
+      const progress = Math.max(0, Math.min(1, elapsed / duration));
+      if (isHold) {
+        setOrbScale(orbScale); // Hold keeps scale
+      } else {
+        setOrbScale(startScale + (endScale - startScale) * progress);
+      }
+      if (elapsed < duration && !isHold) {
+        frame = requestAnimationFrame(animate);
+      } else if (!isHold) {
+        setOrbScale(endScale);
+      }
+    }
+    setOrbScale(startScale);
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+    // eslint-disable-next-line
+  }, [stageIndex]);
+
+  // Breathing guidance text
+  const getBreathText = () => {
+    switch (current?.name) {
+      case 'inhale':
+        return 'Breathe in deeply...';
+      case 'hold':
+        return 'Hold your breath...';
+      case 'exhale':
+        return 'Breathe out completely...';
+      case 'holdAfterExhale':
+        return 'Hold...';
+      default:
+        return '';
+    }
   };
 
-  const currentInfo = stageInfo[currentStage.name];
-
   return (
-    <div className="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8 relative w-full px-4">
-      {/* Simple explanation & Safety Notice */}
-      <div className="max-w-md w-full">
-        <p className="text-xs sm:text-sm text-white/60 mb-2">
-          💡 <span className="font-medium">Why this helps:</span> Controlled breathing can help activate your body's natural calming response, bringing a sense of ease.
-        </p>
-        <p className="text-xs sm:text-sm text-white/50 italic">
-          You can return to natural breathing anytime. If you feel dizzy or uncomfortable, simply pause and breathe normally.
-        </p>
-      </div>
+    <>
+      <div className="flex flex-col items-center justify-center text-center space-y-6 relative w-full px-4">
+        {/* Guidance text (kept minimal for all entry points) */}
+        <div className="max-w-md w-full text-center">
+          <p className="text-xs sm:text-sm text-white/60 mb-2">💡 <span className="font-medium">Why this helps:</span> Controlled breathing calms the nervous system.</p>
+        </div>
 
-      {/* Enhanced Breathing Orb */}
-      <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center" key={currentStageIndex}>
-        {/* Outer glow layers */}
-        <div 
-          className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 opacity-40 blur-[60px] transition-all ease-linear"
-          style={{ 
-            transitionDuration: `${currentStage.duration}ms`,
-            transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.25)' : 'scale(0.85)',
-            transitionTimingFunction: 'ease-in-out'
-          }}
-        ></div>
-        
-        <div 
-          className="absolute inset-8 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 opacity-50 blur-[40px] transition-all ease-linear"
-          style={{ 
-            transitionDuration: `${currentStage.duration}ms`,
-            transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.2)' : 'scale(0.85)',
-            transitionTimingFunction: 'ease-in-out'
-          }}
-        ></div>
-        
-        {/* Ring glow */}
-        <div 
-          className="absolute inset-16 rounded-full border-2 border-blue-400/60 transition-all ease-linear"
-          style={{ 
-            transitionDuration: `${currentStage.duration}ms`,
-            transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.15)' : 'scale(0.85)',
-            boxShadow: currentStage.name === 'inhale' || currentStage.name === 'hold' 
-              ? '0 0 40px rgba(59, 130, 246, 0.9), inset 0 0 40px rgba(6, 182, 212, 0.6)'
-              : '0 0 20px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.2)',
-            transitionTimingFunction: 'ease-in-out'
-          }}
-        ></div>
-        
-        {/* Main orb */}
-        <div className="relative z-10">
+        {/* Orb container */}
+        <div className={`relative ${sizes.outer} flex items-center justify-center`} key={stageIndex}>
+          {/* Outer soft glow */}
           <div
-            className="w-40 h-40 sm:w-48 sm:h-48 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 backdrop-blur-xl flex items-center justify-center transition-all ease-linear"
-            style={{ 
-              transitionDuration: `${currentStage.duration}ms`,
-              transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.15)' : 'scale(0.85)',
-              boxShadow: currentStage.name === 'inhale' || currentStage.name === 'hold'
-                ? '0 0 60px rgba(6, 182, 212, 0.9), 0 0 120px rgba(59, 130, 246, 0.7), inset 0 0 60px rgba(255, 255, 255, 0.3)'
-                : '0 0 30px rgba(6, 182, 212, 0.4), 0 0 60px rgba(59, 130, 246, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.05)',
-              transitionTimingFunction: 'ease-in-out'
-            }}
+            className={`absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 opacity-30 ${variant === 'standard' ? 'blur-[60px]' : 'blur-[36px]'}`}
+            style={{ transform: `scale(${orbScale})`, transition: 'none' }}
+          />
+
+          {/* Middle ring */}
+          <div
+            className={`${sizes.inset8} absolute rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 opacity-45 ${variant === 'standard' ? 'blur-[36px]' : 'blur-[18px]'}`}
+            style={{ transform: `scale(${orbScale})`, transition: 'none' }}
+          />
+
+          {/* Thin accent ring */}
+          <div
+            className={`${sizes.inset16} absolute rounded-full border-2 border-blue-400/60`}
+            style={{ transform: `scale(${orbScale})`, transition: 'none', boxShadow: orbScale > 1 ? '0 0 40px rgba(59,130,246,0.7)' : '0 0 20px rgba(59,130,246,0.25)' }}
+          />
+
+          {/* Main orb */}
+          <div
+            className={`${sizes.main} rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 flex items-center justify-center relative`}
+            style={{ transform: `scale(${orbScale})`, transition: 'none', boxShadow: orbScale > 1 ? '0 0 80px rgba(6,182,212,0.9)' : '0 0 36px rgba(6,182,212,0.35)' }}
           >
-            {/* Inner bright core */}
-            <div 
-              className="absolute inset-12 rounded-full bg-gradient-to-br from-cyan-300/60 via-teal-300/50 to-transparent blur-md transition-all ease-linear"
-              style={{ 
-                transitionDuration: `${currentStage.duration}ms`,
-                opacity: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 0.7 : 0.2,
-                transitionTimingFunction: 'ease-in-out'
-              }}
-            ></div>
-            
-            {/* Top highlight */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-16 h-8 bg-white/30 rounded-full blur-lg"></div>
-            
-            {/* Content */}
-            <div className="relative text-center z-10">
-              <p className="text-xs sm:text-sm md:text-base font-light text-white tracking-[0.15em] sm:tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg">
-                {currentInfo.text}
-              </p>
-              <p className="text-4xl sm:text-5xl md:text-6xl font-extralight text-white drop-shadow-lg">{Math.ceil(countdown)}</p>
-            </div>
+            {/* Small white core to match test session */}
+            <div className={`${sizes.core} rounded-full bg-white`} style={{ boxShadow: '0 0 30px rgba(255,255,255,0.9)' }} />
           </div>
         </div>
 
-        {/* Particle effects */}
-        <div className="absolute inset-0 overflow-visible pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-cyan-300 rounded-full animate-particle-float opacity-60"
-              style={{
-                left: `${20 + i * 12}%`,
-                top: `${30 + (i % 3) * 20}%`,
-                animationDelay: `${i * 0.8}s`,
-                animationDuration: '4s'
-              }}
-            ></div>
+        {/* Stage progress indicators */}
+        <div className="flex gap-3">
+          {stages.map((s, i) => (
+            <div key={s.name + i} className={`h-1 rounded-full ${i === stageIndex ? 'w-12 bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'w-8 bg-white/20'}`} />
           ))}
         </div>
-      </div>
 
-      {/* Stage indicators */}
-      <div className="flex gap-3">
-        {stages.map((stage, index) => (
-          <div
-            key={stage.name + index}
-            className={`h-1 rounded-full transition-all duration-500 ${
-              index === currentStageIndex 
-                ? 'w-12 bg-gradient-to-r from-cyan-400 to-teal-400 shadow-[0_0_10px_rgba(6,182,212,0.8)]' 
-                : 'w-8 bg-white/20'
-            }`}
-          />
-        ))}
+        {/* Breathing guidance below orb */}
+        <div className="mt-8">
+          <p className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-2">{getBreathText()}</p>
+          <p className="text-sm text-white/50 max-w-md px-4">Follow the orb as it expands and contracts</p>
+        </div>
       </div>
-
-      {/* Permissive guidance */}
-      <p className="text-sm text-white/50 max-w-md px-4">
-        Follow the rhythm at your own pace. There's no pressure to match it perfectly - simply allow your breath to find its natural flow.
-      </p>
-    </div>
+    </>
   );
 };
 

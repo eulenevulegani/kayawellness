@@ -10,16 +10,10 @@ interface SoundscapePlayerProps {
   timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night' | string;
 }
 
-const getSoundscapeUrl = (title: string): string => {
-  const lowerTitle = title.toLowerCase();
-  // Using reliable free audio sources from Mixkit
-  if (lowerTitle.includes('rain')) return 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3';
-  if (lowerTitle.includes('forest') || lowerTitle.includes('meadow') || lowerTitle.includes('sunlit')) return 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3';
-  if (lowerTitle.includes('cosmic') || lowerTitle.includes('space') || lowerTitle.includes('drift')) return 'https://assets.mixkit.co/active_storage/sfx/513/513-preview.mp3';
-  if (lowerTitle.includes('ocean') || lowerTitle.includes('waves')) return 'https://assets.mixkit.co/active_storage/sfx/2472/2472-preview.mp3';
-  // Fallback sound - gentle ambient
-  return 'https://assets.mixkit.co/active_storage/sfx/2466/2466-preview.mp3';
-};
+
+// All ambient/fallback sound URLs removed for a silent experience
+// getSoundscapeUrl is now a no-op
+const getSoundscapeUrl = (title: string): string => '';
 
 const SoundscapePlayer: React.FC<SoundscapePlayerProps> = ({ 
   title, 
@@ -30,7 +24,7 @@ const SoundscapePlayer: React.FC<SoundscapePlayerProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeFrequency, setActiveFrequency] = useState<string>('');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Removed audioRef for silent soundscapes
 
   // Determine current time of day if not provided
   const getCurrentTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
@@ -53,34 +47,20 @@ const SoundscapePlayer: React.FC<SoundscapePlayerProps> = ({
     // Cleanup on unmount
     return () => {
       frequencyGenerator.stop();
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
     };
   }, []);
 
   const togglePlayback = () => {
     if (isPlaying) {
-      // Stop playing
       frequencyGenerator.stop();
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
       setIsPlaying(false);
       setActiveFrequency('');
     } else {
-      // Start playing therapeutic frequencies
       setIsLoading(true);
-      
-      // Play the soundscape (multiple frequencies)
       frequencyGenerator.playSoundscape(soundscapeConfig);
-      
-      // Set active frequency display
       if (frequencies.length > 0) {
         setActiveFrequency(frequencies[0].name);
       }
-      
       setIsLoading(false);
       setIsPlaying(true);
     }

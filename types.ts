@@ -106,7 +106,8 @@ export interface BreathworkItem {
 export type SessionStep = 
   | { type: 'affirmation', data: { text: string } }
   | { type: 'breathwork', data: BreathworkItem }
-  | { type: 'meditation', data: MeditationItem };
+  | { type: 'meditation', data: MeditationItem }
+  | { type: 'frequency', data: {} };
 
 export interface PersonalizedSessionData {
   soundscape: SoundscapeItem;
@@ -115,15 +116,6 @@ export interface PersonalizedSessionData {
 
 
 export type ActivityType = 'breathwork' | 'soundscape' | 'subliminal' | 'affirmation' | 'sleep-story';
-
-export interface SubliminalItem {
-  title: string;
-  description: string;
-  affirmations: string[];
-  frequency: string; // e.g., "432 Hz", "528 Hz"
-  durationMinutes: number;
-  category: 'confidence' | 'abundance' | 'healing' | 'sleep' | 'focus';
-}
 
 export interface AffirmationItem {
   text: string;

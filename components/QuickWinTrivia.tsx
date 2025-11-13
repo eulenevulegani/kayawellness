@@ -97,16 +97,16 @@ const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip }) =
   const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg animate-fade-in">
       <div className="w-full max-w-md mx-4">
-        <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-white/20 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-gradient-to-br from-black via-slate-900 to-black border border-white/20 rounded-3xl p-8 shadow-2xl">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center animate-gentle-pulse">
-              <SparklesIcon className="w-8 h-8 text-purple-400" />
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-full flex items-center justify-center animate-gentle-pulse">
+              <SparklesIcon className="w-8 h-8 text-teal-300" />
             </div>
             <h2 className="text-2xl font-light text-white mb-2">Quick Cosmic Fact</h2>
-            <p className="text-sm text-white/60">Earn {currentQuestion.points} points</p>
+            <p className="text-sm text-teal-300">Earn {currentQuestion.points} points</p>
           </div>
 
           {/* Question */}
@@ -139,11 +139,11 @@ const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip }) =
               {/* Result */}
               <div className={`text-center p-6 rounded-2xl mb-6 ${
                 isCorrect 
-                  ? 'bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-400/30'
-                  : 'bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-400/30'
+                  ? 'bg-gradient-to-br from-cyan-500/10 to-teal-500/10 border border-cyan-400/30'
+                  : 'bg-gradient-to-br from-white/10 to-white/5 border border-white/20'
               }`}>
                 <div className="text-4xl mb-3">{isCorrect ? '✨' : '🌟'}</div>
-                <h3 className={`text-xl font-semibold mb-2 ${isCorrect ? 'text-green-400' : 'text-orange-400'}`}>
+                <h3 className={`text-xl font-semibold mb-2 ${isCorrect ? 'text-teal-300' : 'text-white/80'}`}>
                   {isCorrect ? `+${currentQuestion.points} Points!` : 'Good Try!'}
                 </h3>
                 <p className="text-sm text-white/80 leading-relaxed">

@@ -729,7 +729,17 @@ const App: React.FC = () => {
     return (
       <>
         {view === 'setupComplete' && <SetupComplete userName={userProfile.name} onContinue={handleSetupConfirmed} />}
-        {view === 'dashboard' && <Dashboard userProfile={userProfile} achievements={achievements} sessionHistory={sessionHistory} onShowAffirmation={handleShowAffirmation} programs={WELLNESS_PROGRAMS} sessionCompletedToday={sessionCompletedToday} onNavigate={setView} />}
+        {view === 'dashboard' && (
+          <Dashboard
+            userProfile={userProfile}
+            achievements={achievements}
+            sessionHistory={sessionHistory}
+            onShowAffirmation={handleShowAffirmation}
+            programs={WELLNESS_PROGRAMS}
+            sessionCompletedToday={sessionCompletedToday}
+            onNavigate={setView}
+          />
+        )}
         {view === 'affirmation' && <Affirmation affirmation={currentAffirmation} userName={userProfile.name} onContinue={handleProceedToSession} />}
         {view === 'session' && sessionStepsForPlayer && <PersonalizedSession session={sessionStepsForPlayer} onComplete={handleSessionComplete} userProfile={userProfile} mood={lastMood} />}
         {view === 'completion' && <PostSessionScreen onAddGratitude={handleAddGratitude} onDone={handleCompletionDone} gratitudeEntries={gratitudeEntries} onSaveReflection={() => {}} />}
