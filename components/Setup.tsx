@@ -304,9 +304,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
       case 5:
         return (
           <div key={5} className="animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Daily Touch Points</h2>
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Voice Guide</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
-              ⭐ Planet 5: When the universe calls you
+              🎵 Planet 5: Choose the voice that resonates with you
             </p>
             <div className="max-w-lg mx-auto">
               <label className="block text-white/80 mb-2 text-xs font-medium text-center">Voice Preference (Optional)</label>
@@ -332,7 +332,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
           <div key={6} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Daily Touch Points</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
-              🌟 Planet 7: When the universe calls you
+              🌟 Planet 6: When the universe calls you
             </p>
             <div className="grid grid-cols-1 gap-2.5 max-w-lg mx-auto">
               {CHECK_IN_OPTIONS.map((time) => {
