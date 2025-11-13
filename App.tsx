@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { AppView, UserProfile, SessionHistoryEntry, Achievement, WellnessProgram, GratitudeEntry, Activity, PersonalizedSessionData } from './types';
 import Profile from './components/Profile';
-import Journal from './components/Journal';
 import SleepStories from './components/SleepStory';
 import Setup from './components/Setup';
 import Explore from './components/Programs';
-import EnhancedCommunity from './components/CommunityEnhanced';
+import Community from './components/Community';
 import Dashboard from './components/Journey';
 import ActivityPlayer from './components/Session';
 import Navigation from './components/CompletionScreen';
@@ -16,6 +15,11 @@ import Affirmation from './components/Affirmation';
 import SetupComplete from './components/SetupComplete';
 import ProgramComplete from './components/ProgramComplete';
 import TherapistMatcher from './components/TherapistMatcher';
+import ConstellationStreak from './components/ConstellationStreak';
+import QuickWinTrivia from './components/QuickWinTrivia';
+import GratitudeSkyFeed from './components/GratitudeSkyFeed';
+import AchievementUnlock from './components/AchievementUnlock';
+import TriviaGame from './components/TriviaGame';
 import WellnessEvents from './components/WellnessEvents';
 import WellnessResources from './components/WellnessResources';
 import MoodInsights from './components/MoodInsights';
@@ -28,6 +32,7 @@ import VerificationScreen from './components/VerificationScreen';
 import Loader from './components/Loader';
 import SplashScreen from './components/SplashScreen';
 import Pricing from './components/Pricing';
+import BreathingIntro from './components/BreathingIntro';
 import AudioTest from './components/AudioTest';
 import { supabase, getCurrentUser } from './services/supabase.client';
 import { StarIcon } from './components/Icons';
@@ -71,7 +76,6 @@ export const WELLNESS_PROGRAMS: WellnessProgram[] = [
 
 const XP_CONFIG = {
   session: 50,
-  journal: 20,
   gratitude: 10,
 };
 const calculateXpForLevel = (level: number) => 100 * Math.pow(level, 1.5);
@@ -87,7 +91,8 @@ const App: React.FC = () => {
   // User data state (now from API instead of localStorage)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [view, setView] = useState<AppView>('landing');
-  const [showSplash, setShowSplash] = useState(false);
+  const [showSplash, setShowSplash] = useState(false); // No longer using splash screen
+  const [hasCompletedInitialSplash, setHasCompletedInitialSplash] = useState(true);
   
   // Debug view changes
   useEffect(() => {
@@ -103,6 +108,7 @@ const App: React.FC = () => {
   const [lastMood, setLastMood] = useState<string>('');
   const [currentAffirmation, setCurrentAffirmation] = useState<string>('');
   const [completedProgram, setCompletedProgram] = useState<WellnessProgram | null>(null);
+  const [breathingIntroFeeling, setBreathingIntroFeeling] = useState<string>('');
 
   // UI state
   const [levelUpInfo, setLevelUpInfo] = useState<{ newLevel: number } | null>(null);
@@ -127,7 +133,13 @@ const App: React.FC = () => {
   }, []);
   
   // Check authentication on mount and listen for auth changes (email link clicks)
+  // Only run after initial splash is completed
   useEffect(() => {
+    // Don't check auth until initial splash is done
+    if (!hasCompletedInitialSplash) {
+      return;
+    }
+
     const checkAuth = async () => {
       // Check if user is authenticated with Supabase
       const isAuth = await authService.isAuthenticated();
@@ -146,12 +158,14 @@ const App: React.FC = () => {
             setPendingSetupProfile(null);
             localStorage.removeItem('kaya-pending-signup');
             
-            // If user has completed profile, go to dashboard
-            // Otherwise they need to complete setup
-            setView(profile.name ? 'dashboard' : 'setup');
+            // Check if profile is complete (has essential onboarding data)
+            // Existing users should have name and goals, new users need to complete setup
+            const isProfileComplete = profile.name && profile.name.trim().length > 0 && profile.goals && profile.goals.length > 0;
+            setView(isProfileComplete ? 'dashboard' : 'setup');
             
             console.log('✅ User authenticated and profile loaded from Supabase');
-            console.log('🏠 Navigating to:', profile.name ? 'dashboard' : 'setup');
+            console.log('📊 Profile data - Name:', profile.name, 'Goals:', profile.goals?.length || 0);
+            console.log('🏠 Navigating to:', isProfileComplete ? 'dashboard' : 'setup');
           } else {
             // Profile doesn't exist yet
             console.log('⚠️ No profile found in Supabase');
@@ -225,7 +239,7 @@ const App: React.FC = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [pendingSetupProfile]);
+  }, [hasCompletedInitialSplash, pendingSetupProfile]);
 
   // Load user data when authenticated
   useEffect(() => {
@@ -239,10 +253,11 @@ const App: React.FC = () => {
       const loadingTimeout = setTimeout(() => {
         console.warn('⚠️ Data loading timeout - proceeding anyway');
         setIsLoadingData(false);
-      }, 5000); // 5 second timeout
+      }, 3000); // 3 second timeout
       
       try {
-        const [history, achievementList, gratitude] = await Promise.all([
+        // Try to load data but don't fail if backend is down
+        const results = await Promise.allSettled([
           userService.getSessionHistory(),
           userService.getAchievements(),
           userService.getGratitudeEntries()
@@ -250,11 +265,16 @@ const App: React.FC = () => {
         
         clearTimeout(loadingTimeout);
         
+        // Extract data from settled promises
+        const history = results[0].status === 'fulfilled' ? results[0].value : [];
+        const achievementList = results[1].status === 'fulfilled' ? results[1].value : [];
+        const gratitude = results[2].status === 'fulfilled' ? results[2].value : [];
+        
         setSessionHistory(Array.isArray(history) ? history : []);
         setAchievements(Array.isArray(achievementList) ? achievementList : []);
         setGratitudeEntries(Array.isArray(gratitude) ? gratitude : []);
         
-        console.log('✅ User data loaded successfully');
+        console.log('✅ User data loaded (backend may be offline, using defaults)');
       } catch (error) {
         clearTimeout(loadingTimeout);
         console.error('❌ Failed to load user data:', error);
@@ -437,18 +457,15 @@ const App: React.FC = () => {
   };
 
   const handleSplashComplete = () => {
-    // Clear all splash-triggering states
+    // No longer needed - landing page handles its own animation
+    setHasCompletedInitialSplash(true);
     setShowSplash(false);
-    setIsLoading(false);
-    setIsLoadingData(false);
     
-    // Navigate to setupComplete only after new account creation
-    // For returning users, view is already set to 'dashboard' from checkAuth
-    if (showSplash && userProfile?.name) {
-      // This was triggered by showSplash after account creation
-      setView('setupComplete');
+    // If this was the initial splash, authentication check will happen automatically
+    // For subsequent splashes (after setup), navigate appropriately
+    if (userProfile?.name && isAuthenticated) {
+      setView('dashboard');
     }
-    // Otherwise keep current view (dashboard for returning users)
   };
 
   const handleSetupConfirmed = () => {
@@ -548,50 +565,11 @@ const App: React.FC = () => {
     }
   }
 
-  const handleSaveReflection = async (reflectionText: string) => {
-    try {
-      const historyEntry = await userService.addSession({
-        date: new Date().toISOString(),
-        mood: lastMood,
-        reflection: reflectionText,
-      });
-      setSessionHistory(prev => [historyEntry, ...prev]);
-
-      // Generate and unlock achievement
-      const achData = await generateAchievement(lastMood, reflectionText);
-      const newAchievement = await userService.addAchievement({
-        ...achData,
-        date: new Date().toISOString(),
-      });
-      setAchievements(prev => [newAchievement, ...prev]);
-      setNewlyUnlockedAchievement(newAchievement);
-
-      // Add XP
-      await handleAddXp(XP_CONFIG.journal, 'journal_reflection');
-    } catch (error) {
-      console.error('Failed to save reflection:', error);
-    }
-  };
-  
   const handleProgramCompletionContinue = () => {
     setCompletedProgram(null);
     setView('dashboard');
   };
   
-  const handleSaveJournalEntry = async (entryText: string) => {
-    try {
-      const entry = await userService.addSession({
-        date: new Date().toISOString(),
-        mood: 'Journaling',
-        reflection: entryText,
-      });
-      setSessionHistory(prev => [entry, ...prev]);
-      await handleAddXp(XP_CONFIG.journal, 'journal_entry');
-    } catch (error) {
-      console.error('Failed to save journal entry:', error);
-    }
-  };
-
   const handleAddGratitude = async (word: string) => {
     try {
       const newEntry = await userService.addGratitudeEntry({
@@ -651,9 +629,13 @@ const App: React.FC = () => {
   };
 
   const handleAuthSuccess = (user: UserProfile) => {
+    console.log('✅ Login successful, user profile:', user);
     setUserProfile(user);
     setIsAuthenticated(true);
-    setView(user.name ? 'dashboard' : 'setup');
+    // Existing users should always have name, goals, etc. Only redirect to setup if profile is incomplete
+    const isProfileComplete = user.name && user.name.trim().length > 0 && user.goals && user.goals.length > 0;
+    setView(isProfileComplete ? 'dashboard' : 'setup');
+    console.log('🏠 Navigating to:', isProfileComplete ? 'dashboard' : 'setup', 'Profile complete:', isProfileComplete);
   };
 
   const handleSelectPlan = async (tierId: 'stardust' | 'constellation' | 'universe') => {
@@ -677,24 +659,24 @@ const App: React.FC = () => {
   const renderContent = () => {
     console.log('📍 Current view:', view, 'isAuthenticated:', isAuthenticated);
     
-    // Normalize view names (map new navigation names to old view names)
-    const normalizedView = view === 'stellarHome' ? 'dashboard'
-      : view === 'cosmicLibrary' ? 'explore'
-      : view === 'reflectionChamber' ? 'journal'
-      : view === 'stellarAtlas' ? 'profile'
-      : view;
-    
     // Special pages that don't need authentication or user profile
-    if (normalizedView === 'audioTest') {
+    if (view === 'audioTest') {
       return <AudioTest />;
     }
     
     // Landing page and auth don't need user profile
-    if (normalizedView === 'landing') {
+    if (view === 'landing') {
       return <LandingPage setView={setView} userProfile={userProfile} />;
     }
     
-    if (normalizedView === 'verification') {
+    if (view === 'breathingIntro') {
+      return <BreathingIntro onComplete={(feeling) => {
+        setBreathingIntroFeeling(feeling);
+        setView('setup');
+      }} />;
+    }
+    
+    if (view === 'verification') {
       console.log('✉️ Rendering VerificationScreen for:', pendingVerificationEmail);
       return (
         <VerificationScreen 
@@ -720,12 +702,12 @@ const App: React.FC = () => {
       );
     }
     
-    if (normalizedView === 'auth') {
+    if (view === 'auth') {
       console.log('🔑 Rendering AuthScreen');
       return <AuthScreen onAuthSuccess={handleAuthSuccess} onSignupRedirect={() => setView('setup')} />;
     }
     
-    if (normalizedView === 'setup') {
+    if (view === 'setup') {
       return <Setup onComplete={handleSetupComplete} />;
     }
 
@@ -746,42 +728,31 @@ const App: React.FC = () => {
 
     return (
       <>
-        {normalizedView === 'setupComplete' && <SetupComplete userName={userProfile.name} onContinue={handleSetupConfirmed} />}
-        {normalizedView === 'dashboard' && <Dashboard userProfile={userProfile} achievements={achievements} sessionHistory={sessionHistory} onShowAffirmation={handleShowAffirmation} programs={WELLNESS_PROGRAMS} sessionCompletedToday={sessionCompletedToday} onNavigate={setView} />}
-        {normalizedView === 'affirmation' && <Affirmation affirmation={currentAffirmation} userName={userProfile.name} onContinue={handleProceedToSession} />}
-        {normalizedView === 'session' && sessionStepsForPlayer && <PersonalizedSession session={sessionStepsForPlayer} onComplete={handleSessionComplete} userProfile={userProfile} />}
-        {normalizedView === 'completion' && <PostSessionScreen onAddGratitude={handleAddGratitude} onDone={handleCompletionDone} gratitudeEntries={gratitudeEntries} onSaveReflection={handleSaveReflection} />}
-        {normalizedView === 'programComplete' && completedProgram && <ProgramComplete program={completedProgram} onContinue={handleProgramCompletionContinue} />}
-        {normalizedView === 'explore' && <Explore programs={WELLNESS_PROGRAMS} onStartProgram={handleStartProgram} onStartActivity={handleStartActivity} onNavigate={setView} userProfile={userProfile} />}
-        {normalizedView === 'journal' && <Journal history={sessionHistory} achievements={achievements} onClose={() => setView('dashboard')} onSaveEntry={handleSaveJournalEntry} userProfile={userProfile} />}
-        {normalizedView === 'sleepStories' && <SleepStories onClose={() => setView('dashboard')} />}
-        {normalizedView === 'community' && <EnhancedCommunity entries={gratitudeEntries} onClose={() => setView('dashboard')} userProfile={userProfile} />}
-        {normalizedView === 'profile' && <Profile profile={userProfile} onSave={handleSaveProfile} onClose={() => setView('dashboard')} onResetProgram={handleResetProgram} onResetAccount={handleResetAccount} onLogout={handleLogout} />}
-        {normalizedView === 'universe' && <Universe onNavigate={setView} />}
-        {normalizedView === 'gamification' && <GamificationDashboard onBack={() => setView('dashboard')} />}
-        {normalizedView === 'therapists' && <TherapistMatcher userProfile={userProfile} onBack={() => setView('universe')} />}
-        {normalizedView === 'events' && <WellnessEvents onBack={() => setView('universe')} />}
-        {normalizedView === 'resources' && <WellnessResources subscriptionTier={userProfile.subscriptionTier} onBack={() => setView('universe')} />}
-        {normalizedView === 'insights' && <MoodInsights sessionHistory={sessionHistory} gratitudeEntries={gratitudeEntries} streak={userProfile.streak} onBack={() => setView('universe')} />}
-        {normalizedView === 'pricing' && <Pricing onSelectPlan={handleSelectPlan} currentTier={userProfile.subscriptionTier} />}
+        {view === 'setupComplete' && <SetupComplete userName={userProfile.name} onContinue={handleSetupConfirmed} />}
+        {view === 'dashboard' && <Dashboard userProfile={userProfile} achievements={achievements} sessionHistory={sessionHistory} onShowAffirmation={handleShowAffirmation} programs={WELLNESS_PROGRAMS} sessionCompletedToday={sessionCompletedToday} onNavigate={setView} />}
+        {view === 'affirmation' && <Affirmation affirmation={currentAffirmation} userName={userProfile.name} onContinue={handleProceedToSession} />}
+        {view === 'session' && sessionStepsForPlayer && <PersonalizedSession session={sessionStepsForPlayer} onComplete={handleSessionComplete} userProfile={userProfile} />}
+        {view === 'completion' && <PostSessionScreen onAddGratitude={handleAddGratitude} onDone={handleCompletionDone} gratitudeEntries={gratitudeEntries} onSaveReflection={() => {}} />}
+        {view === 'programComplete' && completedProgram && <ProgramComplete program={completedProgram} onContinue={handleProgramCompletionContinue} />}
+        {view === 'explore' && <Explore programs={WELLNESS_PROGRAMS} onStartProgram={handleStartProgram} onStartActivity={handleStartActivity} onNavigate={setView} userProfile={userProfile} />}
+        {view === 'sleepStories' && <SleepStories onClose={() => setView('dashboard')} />}
+        {view === 'community' && <Community entries={gratitudeEntries} onClose={() => setView('dashboard')} />}
+        {view === 'profile' && <Profile profile={userProfile} onSave={handleSaveProfile} onClose={() => setView('dashboard')} onResetProgram={handleResetProgram} onResetAccount={handleResetAccount} onLogout={handleLogout} />}
+        {view === 'universe' && <Universe onNavigate={setView} />}
+        {view === 'gamification' && <GamificationDashboard onBack={() => setView('dashboard')} />}
+        {view === 'therapists' && <TherapistMatcher userProfile={userProfile} onBack={() => setView('universe')} />}
+        {view === 'events' && <WellnessEvents onBack={() => setView('universe')} />}
+        {view === 'resources' && <WellnessResources subscriptionTier={userProfile.subscriptionTier} onBack={() => setView('universe')} />}
+        {view === 'insights' && <MoodInsights sessionHistory={sessionHistory} gratitudeEntries={gratitudeEntries} streak={userProfile.streak} onBack={() => setView('universe')} />}
+        {view === 'trivia' && <TriviaGame onBack={() => setView('universe')} onPointsEarned={(points) => console.log(`Earned ${points} points!`)} subscriptionTier={userProfile.subscriptionTier} />}
+        {view === 'pricing' && <Pricing onSelectPlan={handleSelectPlan} currentTier={userProfile.subscriptionTier} />}
       </>
     );
   };
 
-  // Helper function to normalize view names
-  const normalizeView = (v: AppView): AppView => {
-    if (v === 'stellarHome') return 'dashboard';
-    if (v === 'cosmicLibrary') return 'explore';
-    if (v === 'reflectionChamber') return 'journal';
-    if (v === 'stellarAtlas') return 'profile';
-    return v;
-  };
-
-  const normalizedView = normalizeView(view);
-
-  const showAppChrome = isAuthenticated && !['landing', 'auth', 'verification', 'setup', 'session', 'completion', 'affirmation', 'setupComplete', 'programComplete', 'gamification'].includes(normalizedView);
-  const showVoiceOrb = ['dashboard', 'journal'].includes(normalizedView);
-  const backgroundGradient = 'from-cyan-400 via-teal-500 to-blue-700';
+  const showAppChrome = isAuthenticated && !['landing', 'auth', 'verification', 'setup', 'session', 'completion', 'affirmation', 'setupComplete', 'programComplete', 'gamification'].includes(view);
+  const showVoiceOrb = ['dashboard'].includes(view);
+  const backgroundGradient = 'from-black via-black to-black';
 
   const handleVoiceStart = () => {
     setIsVoiceListening(true);
@@ -792,28 +763,35 @@ const App: React.FC = () => {
     setIsVoiceListening(false);
   };
 
-  const showGlobalHeader = isAuthenticated && !['landing', 'auth', 'verification', 'setup', 'setupComplete', 'session', 'completion', 'affirmation', 'programComplete'].includes(normalizedView);
+  const showGlobalHeader = isAuthenticated && !['landing', 'auth', 'verification', 'setup', 'setupComplete', 'session', 'completion', 'affirmation', 'programComplete'].includes(view);
 
-  // Show splash screen for:
-  // 1. Initial authentication check (isLoading)
-  // 2. Loading user data after authentication (isLoadingData)
-  // 3. After completing account setup (showSplash)
-  if (isLoading || isLoadingData || showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} />;
+  // Show splash screen during initial load - it stays visible during transition to landing
+  const showSplashLayer = !hasCompletedInitialSplash || showSplash;
+
+  // After splash, show loader for authentication/data loading (but not on landing page or breathing intro)
+  if ((isLoading || isLoadingData) && view !== 'landing' && view !== 'breathingIntro') {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-black">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <p className="text-white/60 text-sm">Loading your experience...</p>
+        </div>
+      </div>
+    );
   }
 
-  // Show auth screen if not authenticated and not on landing/auth/verification/setup view
-  if (!isAuthenticated && normalizedView !== 'landing' && normalizedView !== 'auth' && normalizedView !== 'verification' && normalizedView !== 'setup') {
+  // Show auth screen if not authenticated and not on landing/auth/verification/setup/breathingIntro view
+  if (!isAuthenticated && view !== 'landing' && view !== 'auth' && view !== 'verification' && view !== 'setup' && view !== 'breathingIntro') {
     return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
   }
 
   return (
-    <div className={`text-white min-h-screen w-full flex items-center justify-center selection:bg-cyan-300 selection:text-cyan-900 bg-gradient-to-br ${backgroundGradient} transition-colors duration-1000`}>
-      {!['landing', 'auth', 'verification'].includes(normalizedView) && <div className="fixed inset-0 w-full h-full bg-black/20 backdrop-blur-sm"></div>}
+    <div className={`text-white min-h-screen w-full flex items-center justify-center selection:bg-white selection:text-black bg-gradient-to-br ${backgroundGradient} transition-colors duration-1000`}>
+      {!['landing', 'auth', 'verification'].includes(view) && <div className="fixed inset-0 w-full h-full bg-black/10"></div>}
       
       <main className="relative z-10 w-full h-screen flex flex-col">
         {showGlobalHeader && userProfile && <GlobalHeader userProfile={userProfile} onNavigate={setView} />}
-        <div className={`flex-grow w-full ${['explore', 'journal', 'profile', 'universe', 'community', 'insights', 'events', 'resources', 'therapists'].includes(normalizedView) ? 'overflow-auto' : 'flex items-center justify-center overflow-hidden'} ${!['landing', 'auth', 'verification'].includes(normalizedView) ? 'p-2 sm:p-4' : ''}`}>
+        <div className={`flex-grow w-full ${['explore', 'profile', 'universe', 'community', 'insights', 'events', 'resources', 'therapists', 'trivia'].includes(view) ? 'overflow-auto' : 'flex items-center justify-center overflow-hidden'} ${!['landing', 'auth', 'verification'].includes(view) ? 'p-2 sm:p-4' : ''}`}>
           {renderContent()}
         </div>
         {showAppChrome && <Navigation currentView={view} setView={setView} />}
@@ -822,16 +800,16 @@ const App: React.FC = () => {
       {activeActivity && <ActivityPlayer activity={activeActivity} onClose={handleCloseActivity} />}
       
       {levelUpInfo && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-sm mx-4 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-6 text-center">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/10 text-yellow-300 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-sm mx-4 bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse">
               <StarIcon className="w-7 h-7 sm:w-9 sm:h-9" />
             </div>
             <h3 className="text-xl sm:text-2xl font-semibold text-white">Level Up!</h3>
-            <p className="text-white/80 mt-2 mb-6 text-base sm:text-lg">You've reached Level {levelUpInfo.newLevel}.</p>
+            <p className="text-white/70 mt-2 mb-6 text-base sm:text-lg">You've reached Level {levelUpInfo.newLevel}.</p>
             <button
               onClick={() => setLevelUpInfo(null)}
-              className="w-full px-6 py-2 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold hover:opacity-90 transition"
+              className="w-full px-6 py-2 bg-white text-black rounded-full font-semibold hover:bg-white/90 transition"
             >
               Awesome!
             </button>
@@ -840,17 +818,17 @@ const App: React.FC = () => {
       )}
 
       {newlyUnlockedAchievement && (
-         <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-sm mx-4 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-6 text-center">
-             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/10 text-yellow-300 rounded-full flex items-center justify-center mx-auto mb-4">
+         <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-sm mx-4 bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center">
+             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-4">
                <StarIcon className="w-7 h-7 sm:w-9 sm:h-9" />
              </div>
-             <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-yellow-400">Achievement Unlocked</p>
+             <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-white/80">Achievement Unlocked</p>
              <h3 className="text-lg sm:text-xl font-semibold text-white mt-2">{newlyUnlockedAchievement.title}</h3>
              <p className="text-sm sm:text-base text-white/70 mt-2 mb-6">{newlyUnlockedAchievement.description}</p>
              <button
                onClick={() => setNewlyUnlockedAchievement(null)}
-               className="w-full px-6 py-2 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold hover:opacity-90 transition"
+               className="w-full px-6 py-2 bg-white text-black rounded-full font-semibold hover:bg-white/90 transition"
              >
                Continue
              </button>

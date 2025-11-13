@@ -29,7 +29,7 @@ const VerificationScreen: React.FC<VerificationScreenProps> = ({ email, onResend
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-400 via-teal-500 to-blue-700 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-black p-6">
       <div className="w-full max-w-lg">
         {/* Logo and Header */}
         <div className="text-center mb-10">
@@ -40,7 +40,7 @@ const VerificationScreen: React.FC<VerificationScreenProps> = ({ email, onResend
           <p className="text-white/80 text-base mb-2">
             We sent a verification link to
           </p>
-          <p className="text-cyan-200 font-medium text-lg">{email}</p>
+          <p className="text-white/80 font-medium text-lg">{email}</p>
         </div>
 
         {/* Instructions Card */}
@@ -99,7 +99,7 @@ const VerificationScreen: React.FC<VerificationScreenProps> = ({ email, onResend
                 localStorage.removeItem('kaya-pending-signup');
                 window.location.reload();
               }}
-              className="w-full px-6 py-3.5 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-bold text-base hover:opacity-90 hover:scale-105 transform transition shadow-lg"
+              className="w-full px-6 py-3.5 bg-white text-black rounded-full font-bold text-base hover:bg-white/90 hover:scale-105 transform transition shadow-lg"
             >
               Log In Here →
             </button>
@@ -124,7 +124,7 @@ const VerificationScreen: React.FC<VerificationScreenProps> = ({ email, onResend
         {/* Waiting indicator */}
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-2 text-white/50 text-sm">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
             <span>Waiting for email confirmation...</span>
           </div>
         </div>

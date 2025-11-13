@@ -11,58 +11,40 @@ interface PricingProps {
 const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: 'stardust',
-    displayName: 'Stardust',
+    displayName: 'Free',
     price: { monthly: 0, yearly: 0 },
-    description: 'Begin your cosmic journey',
+    description: 'Begin your wellness journey',
     features: [
       { text: '1 personalized session per day', included: true },
       { text: 'Daily affirmations', included: true },
       { text: 'Basic breathwork & meditation', included: true },
       { text: 'Community access (view only)', included: true },
-      { text: 'Basic analytics & progress tracking', included: true },
-      { text: 'Journeys (multi-day programs)', included: false },
-      { text: 'Premium content (sleep stories, subliminals, soundscapes)', included: false },
-      { text: 'Calendar integrations', included: false },
+      { text: 'Basic progress tracking', included: true },
       { text: 'Unlimited sessions', included: false },
-      { text: 'Personal coach access', included: false }
+      { text: 'Multi-day programs', included: false },
+      { text: 'Premium content library', included: false },
+      { text: 'Advanced analytics', included: false },
+      { text: 'Offline access', included: false }
     ]
   },
   {
     id: 'constellation',
-    displayName: 'Constellation',
+    displayName: 'Premium',
     price: { monthly: 9.99, yearly: 79.99 },
-    description: 'Unlimited access to your universe',
+    description: 'Unlimited access to everything',
     popular: true,
     badge: 'Most Popular',
     features: [
-      { text: 'Everything in Stardust, plus:', included: true },
+      { text: 'Everything in Free, plus:', included: true },
       { text: 'Unlimited personalized sessions', included: true, highlight: true },
-      { text: 'All Journeys (multi-day programs)', included: true, highlight: true },
-      { text: 'Premium content (sleep stories, subliminals, soundscapes)', included: true, highlight: true },
-      { text: 'Advanced breathwork & meditations', included: true, highlight: true },
-      { text: 'Calendar integrations', included: true, highlight: true },
+      { text: 'All multi-day programs & journeys', included: true, highlight: true },
+      { text: 'Full premium content library', included: true, highlight: true },
+      { text: 'Sleep stories & soundscapes', included: true, highlight: true },
+      { text: 'Advanced analytics & insights', included: true },
       { text: 'Community posting access', included: true },
       { text: 'Offline downloads', included: true },
-      { text: 'Advanced analytics & insights', included: true },
-      { text: 'Personal coach access', included: false }
-    ]
-  },
-  {
-    id: 'universe',
-    displayName: 'Universe',
-    price: { monthly: 19.99, yearly: 159.99 },
-    description: 'Complete cosmic mastery with personal guidance',
-    badge: 'Premium',
-    features: [
-      { text: 'Everything in Constellation, plus:', included: true },
-      { text: 'Personal wellness coach access', included: true, highlight: true },
-      { text: '1-on-1 coaching sessions (30min/month)', included: true, highlight: true },
-      { text: 'Custom program creation by coach', included: true, highlight: true },
-      { text: 'Priority coach response (24hr)', included: true },
-      { text: 'Live group coaching sessions', included: true },
-      { text: 'Family plan (up to 5 members)', included: true },
-      { text: 'Early access to new content', included: true },
-      { text: 'Export all data & insights', included: true }
+      { text: 'Calendar integrations', included: true },
+      { text: 'Priority support', included: true }
     ]
   }
 ];
@@ -80,30 +62,30 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
   };
 
   return (
-    <div className="min-h-screen p-6 overflow-y-auto" style={{ backgroundColor: '#06b6d4' }}>
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen p-6 overflow-y-auto bg-black">
+      <div className="max-w-5xl mx-auto">
         
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-light text-white mb-4 tracking-wide">
-            Choose Your Cosmic Journey
+            Choose Your Plan
           </h1>
           <p className="text-white/70 text-lg mb-8">
-            From free exploration to unlimited universe access
+            Start free, upgrade when you're ready
           </p>
           
           {/* Social Proof */}
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/60 text-sm mb-8">
             <span className="flex items-center gap-2">
-              <span className="text-cyan-400">✦</span>
+              <span className="text-white">✦</span>
               100,000+ journeys started
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-cyan-400">✦</span>
+              <span className="text-white">✦</span>
               4.8★ from 12,000+ reviews
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-cyan-400">✦</span>
+              <span className="text-white">✦</span>
               #1 mindfulness app 2025
             </span>
           </div>
@@ -114,7 +96,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
               onClick={() => setBillingCycle('monthly')}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                 billingCycle === 'monthly'
-                  ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 shadow-lg shadow-cyan-500/30'
+                  ? 'bg-white text-black shadow-lg'
                   : 'text-white/70 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -124,12 +106,12 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
               onClick={() => setBillingCycle('yearly')}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all relative ${
                 billingCycle === 'yearly'
-                  ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 shadow-lg shadow-cyan-500/30'
+                  ? 'bg-white text-black shadow-lg'
                   : 'text-white/70 hover:text-white hover:bg-white/5'
               }`}
             >
               Yearly
-              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-yellow-900 text-xs px-2 py-0.5 rounded-full font-semibold shadow-md">
+              <span className="absolute -top-2 -right-2 bg-white text-black text-xs px-2 py-0.5 rounded-full font-semibold shadow-md">
                 Save 33%
               </span>
             </button>
@@ -137,7 +119,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
           {SUBSCRIPTION_TIERS.map((tier) => {
             const isCurrentTier = currentTier === tier.id;
             const price = billingCycle === 'monthly' ? tier.price.monthly : tier.price.yearly;
@@ -148,18 +130,14 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
                 key={tier.id}
                 className={`relative flex flex-col rounded-2xl p-8 backdrop-blur-md transition-all duration-300 ${
                   tier.popular
-                    ? 'bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border-2 border-cyan-400/50 shadow-2xl shadow-cyan-500/20 md:scale-105 hover:shadow-cyan-500/30'
-                    : 'bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10'
+                    ? 'bg-white/10 border-2 border-white shadow-2xl md:scale-105'
+                    : 'bg-white/5 border border-white/20 hover:border-white/30 hover:bg-white/10'
                 }`}
               >
                 {/* Badge */}
                 {tier.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className={`text-xs font-semibold px-4 py-1 rounded-full shadow-lg ${
-                      tier.popular
-                        ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 shadow-cyan-500/30'
-                        : 'bg-gradient-to-r from-yellow-400 to-orange-400 text-yellow-900'
-                    }`}>
+                    <span className="bg-white text-black text-xs font-semibold px-4 py-1 rounded-full shadow-lg">
                       {tier.badge}
                     </span>
                   </div>
@@ -189,7 +167,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
                         </span>
                       </div>
                       {billingCycle === 'yearly' && savings > 0 && (
-                        <p className="text-cyan-400 text-sm mt-1 font-medium">
+                        <p className="text-white text-sm mt-1 font-medium">
                           Save {savings}% with annual billing
                         </p>
                       )}
@@ -208,7 +186,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
                     >
                       {feature.included ? (
                         <CheckIcon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                          feature.highlight ? 'text-cyan-400' : 'text-white/50'
+                          feature.highlight ? 'text-white' : 'text-white/50'
                         }`} />
                       ) : (
                         <span className="w-5 h-5 flex-shrink-0 text-white/30 mt-0.5">×</span>
@@ -236,11 +214,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan, currentTier = 'stardust
                 ) : (
                   <button
                     onClick={() => onSelectPlan(tier.id)}
-                    className={`w-full py-3 rounded-full font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg ${
-                      tier.popular
-                        ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 hover:shadow-xl hover:shadow-cyan-500/30'
-                        : 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 hover:shadow-xl hover:shadow-cyan-500/30'
-                    }`}
+                    className="w-full py-3 rounded-full font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg bg-white text-black hover:bg-white/90"
                   >
                     {tier.id === 'constellation' ? 'Start 7-Day Free Trial' : 'Start Free Trial'}
                   </button>

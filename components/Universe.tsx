@@ -9,34 +9,36 @@ interface UniverseProps {
 const Universe: React.FC<UniverseProps> = ({ onNavigate }) => {
   const features = [
     {
-      id: 'community',
+      id: 'community' as AppView,
       emoji: '✨',
-      title: 'Constellation',
-      subtitle: 'Community Hub',
-      description: 'Connect with others, join challenges, share progress, and celebrate gratitude',
-      gradient: 'from-cyan-500/20 to-teal-500/20',
-      borderColor: 'border-cyan-400/30',
-      textColor: 'text-cyan-200'
+      title: 'Gratitude Stars',
+      description: 'See the constellation of shared gratitude from the community',
+      gradient: 'from-cyan-500/10 to-teal-500/10',
+      borderColor: 'border-cyan-400/30'
     },
     {
-      id: 'therapists',
+      id: 'trivia' as AppView,
+      emoji: '🎯',
+      title: 'Quick Wellness Trivia',
+      description: 'Learn fun wellness facts and earn points',
+      gradient: 'from-purple-500/10 to-pink-500/10',
+      borderColor: 'border-purple-400/30'
+    },
+    {
+      id: 'therapists' as AppView,
       emoji: '⭐',
-      title: 'Guiding Stars',
-      subtitle: 'Find Therapists',
-      description: 'Connect with licensed therapists who can guide your journey',
-      gradient: 'from-cyan-500/20 to-teal-500/20',
-      borderColor: 'border-cyan-400/30',
-      textColor: 'text-cyan-200'
+      title: 'Find a Therapist',
+      description: 'Connect with licensed wellness practitioners',
+      gradient: 'from-blue-500/10 to-cyan-500/10',
+      borderColor: 'border-blue-400/30'
     },
     {
-      id: 'events',
+      id: 'events' as AppView,
       emoji: '🌌',
-      title: 'Event Horizon',
-      subtitle: 'Wellness Events',
-      description: 'Join community gatherings and wellness workshops',
-      gradient: 'from-teal-500/20 to-blue-500/20',
-      borderColor: 'border-teal-400/30',
-      textColor: 'text-teal-200'
+      title: 'Wellness Events',
+      description: 'Join community wellness workshops and gatherings',
+      gradient: 'from-indigo-500/10 to-blue-500/10',
+      borderColor: 'border-indigo-400/30'
     },
     {
       id: 'resources',
@@ -44,55 +46,56 @@ const Universe: React.FC<UniverseProps> = ({ onNavigate }) => {
       title: 'Galaxy',
       subtitle: 'Tools & Resources',
       description: 'Explore articles, guides, and crisis support resources',
-      gradient: 'from-blue-500/20 to-cyan-500/20',
-      borderColor: 'border-blue-400/30',
-      textColor: 'text-blue-200'
+      gradient: 'from-white/15 to-white/10',
+      borderColor: 'border-indigo-400/30'
     },
     {
-      id: 'insights',
+      id: 'resources' as AppView,
+      emoji: '📚',
+      title: 'Wellness Resources',
+      description: 'Articles, videos, and tools for your wellness journey',
+      gradient: 'from-emerald-500/10 to-green-500/10',
+      borderColor: 'border-emerald-400/30'
+    },
+    {
+      id: 'insights' as AppView,
       emoji: '🪐',
-      title: 'Orbit',
-      subtitle: 'Your Progress',
-      description: 'Track your wellness journey and discover patterns',
-      gradient: 'from-cyan-500/20 to-purple-500/20',
-      borderColor: 'border-cyan-400/30',
-      textColor: 'text-cyan-200'
+      title: 'Your Insights',
+      description: 'Track patterns in your wellness journey',
+      gradient: 'from-amber-500/10 to-orange-500/10',
+      borderColor: 'border-amber-400/30'
     }
   ];
 
   return (
     <div className="h-screen overflow-y-auto">
       <div className="w-full max-w-6xl mx-auto p-6 pt-24 pb-24 animate-fade-in text-white">
-        <header className="mb-6">
-          <h2 className="text-3xl font-light text-white">Your Universe</h2>
-          <p className="text-white/70 text-sm mt-1">Explore wellness resources across your cosmic journey</p>
+        <header className="mb-8 text-center">
+          <h2 className="text-4xl font-light text-white mb-2">Connect & Explore</h2>
+          <p className="text-white/70 text-base">Discover wellness resources and connect with your community</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
           {features.map((feature) => (
-            <div 
-              key={feature.id} 
-              className={`bg-white/5 p-4 rounded-lg border border-white/10 flex flex-col text-left transition-all duration-300 hover:bg-white/10 hover:border-white/20`}
+            <button
+              key={feature.id}
+              onClick={() => onNavigate(feature.id)}
+              className={`group bg-gradient-to-br ${feature.gradient} p-6 rounded-2xl border ${feature.borderColor} flex flex-col text-left transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/20 transform`}
             >
               <div className="flex-grow">
-                <div className="flex items-start gap-3">
-                  <div className={`w-8 h-8 flex-shrink-0 bg-white/10 rounded-full flex items-center justify-center mt-1`}>
-                    <span className="text-xl">{feature.emoji}</span>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                    {feature.emoji}
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-white">{feature.title}</h4>
-                    <p className="text-sm text-white/70">{feature.subtitle}</p>
-                  </div>
+                  <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
                 </div>
-                <p className="text-sm text-white/70 mt-3">{feature.description}</p>
+                <p className="text-white/70 text-sm leading-relaxed">{feature.description}</p>
               </div>
-              <button 
-                onClick={() => onNavigate(feature.id as AppView)}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/10 text-white rounded-full hover:bg-white/20 transition text-sm font-semibold"
-              >
-                Explore
-              </button>
-            </div>
+              <div className="mt-6 flex items-center text-cyan-300 text-sm font-medium group-hover:gap-3 gap-2 transition-all">
+                <span>Explore</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </button>
           ))}
         </div>
       </div>

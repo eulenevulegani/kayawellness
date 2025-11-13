@@ -1,6 +1,10 @@
 /**
+ * DEPRECATED: This component has been superseded by Community.tsx
  * Enhanced Community Component with Social Features
- * Includes support groups, challenges, progress sharing, and therapist Q&A
+ * Includes support groups, challenges, and progress sharing
+ * 
+ * Note: App.tsx now uses the simpler Community.tsx component instead.
+ * This file is kept for reference only.
  */
 
 import React, { useState } from 'react';
@@ -13,7 +17,7 @@ interface CommunityProps {
   userProfile: UserProfile;
 }
 
-type CommunityView = 'constellation' | 'groups' | 'challenges' | 'share' | 'therapist-qa';
+type CommunityView = 'constellation' | 'groups' | 'challenges' | 'share';
 
 interface SupportGroup {
   id: string;
@@ -34,16 +38,6 @@ interface Challenge {
   participants: number;
   yourProgress?: number;
   isActive: boolean;
-}
-
-interface TherapistQASession {
-  id: string;
-  therapistName: string;
-  specialty: string;
-  topic: string;
-  scheduledTime: Date;
-  isLive: boolean;
-  viewerCount?: number;
 }
 
 // Mock data - in production, this would come from a backend
@@ -126,34 +120,6 @@ const CHALLENGES: Challenge[] = [
   }
 ];
 
-const THERAPIST_QA: TherapistQASession[] = [
-  {
-    id: 'qa-1',
-    therapistName: 'Dr. Sarah Chen',
-    specialty: 'Anxiety & Stress',
-    topic: 'Managing Work-Related Stress',
-    scheduledTime: new Date(Date.now() + 3 * 60 * 60 * 1000),
-    isLive: false
-  },
-  {
-    id: 'qa-2',
-    therapistName: 'Dr. Michael Torres',
-    specialty: 'Sleep Psychology',
-    topic: 'Breaking the Insomnia Cycle',
-    scheduledTime: new Date(Date.now() - 30 * 60 * 1000),
-    isLive: true,
-    viewerCount: 234
-  },
-  {
-    id: 'qa-3',
-    therapistName: 'Dr. Emily Watson',
-    specialty: 'Mindfulness & CBT',
-    topic: 'Building Emotional Resilience',
-    scheduledTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    isLive: false
-  }
-];
-
 const simpleHash = (s: string): number => {
   let hash = 0;
   for (let i = 0; i < s.length; i++) {
@@ -204,10 +170,10 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
   };
 
   const renderNavigation = () => (
-    <div className="flex gap-2 overflow-x-auto mb-6 pb-2">
+    <div className="flex gap-2 overflow-x-auto mb-6 pb-2 scrollbar-hide">
       <button
         onClick={() => setView('constellation')}
-        className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+        className={`px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition ${
           view === 'constellation'
             ? 'bg-white text-blue-900 font-semibold'
             : 'bg-white/10 text-white/80 hover:bg-white/20'
@@ -217,7 +183,7 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
       </button>
       <button
         onClick={() => setView('groups')}
-        className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+        className={`px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition ${
           view === 'groups'
             ? 'bg-white text-blue-900 font-semibold'
             : 'bg-white/10 text-white/80 hover:bg-white/20'
@@ -227,7 +193,7 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
       </button>
       <button
         onClick={() => setView('challenges')}
-        className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+        className={`px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition ${
           view === 'challenges'
             ? 'bg-white text-blue-900 font-semibold'
             : 'bg-white/10 text-white/80 hover:bg-white/20'
@@ -237,23 +203,13 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
       </button>
       <button
         onClick={() => setView('share')}
-        className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+        className={`px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 transition ${
           view === 'share'
             ? 'bg-white text-blue-900 font-semibold'
             : 'bg-white/10 text-white/80 hover:bg-white/20'
         }`}
       >
         🌠 Share Progress
-      </button>
-      <button
-        onClick={() => setView('therapist-qa')}
-        className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
-          view === 'therapist-qa'
-            ? 'bg-white text-blue-900 font-semibold'
-            : 'bg-white/10 text-white/80 hover:bg-white/20'
-        }`}
-      >
-        ⭐ Therapist Q&A
       </button>
     </div>
   );
@@ -437,65 +393,6 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
     </div>
   );
 
-  const renderTherapistQA = () => (
-    <div className="flex-grow overflow-y-auto space-y-4">
-      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
-        <h3 className="text-xl font-semibold mb-2">Therapist Q&A Sessions</h3>
-        <p className="text-white/70 text-sm mb-4">
-          Join live sessions with licensed therapists. Ask questions and learn from experts!
-        </p>
-      </div>
-
-      {THERAPIST_QA.map((session) => (
-        <div
-          key={session.id}
-          className={`backdrop-blur-sm border rounded-lg p-5 hover:bg-white/10 transition ${
-            session.isLive
-              ? 'bg-red-500/10 border-red-400/30'
-              : 'bg-white/5 border-white/10'
-          }`}
-        >
-          {session.isLive && (
-            <div className="flex items-center gap-2 mb-3">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-              </span>
-              <span className="text-red-300 text-sm font-semibold">LIVE NOW</span>
-              {session.viewerCount && (
-                <span className="text-white/60 text-sm">• {session.viewerCount} watching</span>
-              )}
-            </div>
-          )}
-
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h4 className="text-lg font-semibold">{session.therapistName}</h4>
-              <p className="text-sm text-cyan-300">{session.specialty}</p>
-            </div>
-            <span className="text-2xl">⭐</span>
-          </div>
-
-          <p className="text-white/90 font-medium mb-2">{session.topic}</p>
-
-          {!session.isLive && (
-            <p className="text-sm text-white/60 mb-3">{formatDate(session.scheduledTime)}</p>
-          )}
-
-          <button
-            className={`w-full px-4 py-3 rounded-lg font-semibold transition ${
-              session.isLive
-                ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 hover:bg-cyan-500/30'
-            }`}
-          >
-            {session.isLive ? 'Join Live Session' : 'Set Reminder'}
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <>
       <div className="w-full max-w-5xl mx-auto p-4 animate-fade-in text-white h-[90vh] flex flex-col">
@@ -505,7 +402,6 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
             {view === 'groups' && '🌌 Support Groups'}
             {view === 'challenges' && '🏆 Community Challenges'}
             {view === 'share' && '🌠 Share Progress'}
-            {view === 'therapist-qa' && '⭐ Therapist Q&A'}
           </h2>
           <button onClick={onClose} className="p-2 -m-2 text-white/60 hover:text-white transition">
             <ArrowLeftIcon className="w-6 h-6" />
@@ -519,7 +415,6 @@ const EnhancedCommunity: React.FC<CommunityProps> = ({ entries, onClose, userPro
         {view === 'groups' && renderGroups()}
         {view === 'challenges' && renderChallenges()}
         {view === 'share' && renderShare()}
-        {view === 'therapist-qa' && renderTherapistQA()}
       </div>
       <style>{`
         @keyframes shimmer {

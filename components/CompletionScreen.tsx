@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { AppView } from '../types';
-import { HomeIcon, BookOpenIcon, LotusIcon, UserIcon, UniverseIcon } from './Icons';
+import { HomeIcon, LotusIcon, UserIcon, OrbIcon, SparklesIcon } from './Icons';
 
 interface NavigationProps {
   currentView: AppView;
@@ -33,21 +33,14 @@ const NavItem: React.FC<{
 };
 
 const Navigation: React.FC<NavigationProps> = ({ currentView, setView }) => {
-  // Map old view names to new ones for backward compatibility
-  const normalizedView = currentView === 'dashboard' ? 'stellarHome' 
-    : currentView === 'explore' ? 'cosmicLibrary'
-    : currentView === 'journal' ? 'reflectionChamber'
-    : currentView === 'profile' ? 'stellarAtlas'
-    : currentView;
-
   return (
     <nav className="relative z-20 w-full max-w-lg mx-auto bg-black/30 backdrop-blur-lg border-t border-white/20 p-1.5 sm:p-2 pb-safe" role="navigation" aria-label="Main navigation">
       <div className="flex justify-around items-center">
-        <NavItem view="stellarHome" label="Home" icon={<HomeIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />
-        <NavItem view="cosmicLibrary" label="Library" icon={<LotusIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />
-        <NavItem view="universe" label="Connect" icon={<UniverseIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />
-        <NavItem view="reflectionChamber" label="Reflect" icon={<BookOpenIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />
-        <NavItem view="stellarAtlas" label="Atlas" icon={<UserIcon className="w-6 h-6" />} currentView={normalizedView} setView={setView} />
+        <NavItem view="dashboard" label="Home" icon={<HomeIcon className="w-6 h-6" />} currentView={currentView} setView={setView} />
+        <NavItem view="explore" label="Explore" icon={<LotusIcon className="w-6 h-6" />} currentView={currentView} setView={setView} />
+        <NavItem view="universe" label="Universe" icon={<OrbIcon className="w-6 h-6" />} currentView={currentView} setView={setView} />
+        <NavItem view="community" label="Stars" icon={<SparklesIcon className="w-6 h-6" />} currentView={currentView} setView={setView} />
+        <NavItem view="profile" label="You" icon={<UserIcon className="w-6 h-6" />} currentView={currentView} setView={setView} />
       </div>
     </nav>
   );

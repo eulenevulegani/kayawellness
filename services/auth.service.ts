@@ -137,6 +137,8 @@ class AuthService {
   // Signup with Supabase - requires email verification
   async signup(data: SignupData): Promise<{ needsVerification: boolean; email: string; message?: string }> {
     try {
+      console.log('🔐 Attempting signup for:', data.email);
+      
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -148,14 +150,26 @@ class AuthService {
         }
       });
 
-      if (error) throw error;
-      if (!authData.user) throw new Error('Signup failed');
+      if (error) {
+        console.error('❌ Supabase signup error:', error);
+        // Check for specific error types
+        if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
+          throw new Error('Network error. Please check your internet connection and try again.');
+        }
+        if (error.message.includes('already registered')) {
+          throw new Error('This email is already registered. Please try logging in instead.');
+        }
+        throw error;
+      }
+      
+      if (!authData.user) throw new Error('Signup failed - no user returned');
 
       // Check if user needs email confirmation
       const needsVerification = !authData.session;
       
       console.log('📧 Signup complete. Needs verification:', needsVerification);
       console.log('🔑 Session:', authData.session ? 'Created' : 'Pending verification');
+      console.log('👤 User ID:', authData.user.id);
 
       if (needsVerification) {
         // Store signup data temporarily for after verification
@@ -169,10 +183,11 @@ class AuthService {
         return {
           needsVerification: true,
           email: data.email,
-          message: 'Please check your email for a verification link or code'
+          message: 'Please check your email for a verification link'
         };
       } else {
-        // Email confirmation disabled or auto-confirmed
+        // Email confirmation disabled or auto-confirmed - session created immediately
+        console.log('✅ Session created immediately - email confirmation disabled');
         return {
           needsVerification: false,
           email: data.email
@@ -180,7 +195,8 @@ class AuthService {
       }
     } catch (error: any) {
       console.error('❌ Signup error:', error);
-      throw new Error(error.message || 'Signup failed');
+      const errorMessage = error.message || 'Signup failed. Please try again.';
+      throw new Error(errorMessage);
     }
   }
 

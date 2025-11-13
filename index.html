@@ -13,7 +13,7 @@
     
     <!-- Meta Tags -->
     <meta name="description" content="KAYA - Your AI-powered wellness companion for meditation, breathwork, and mindful living. Find calm, build resilience, and live better." />
-    <meta name="theme-color" content="#0e7490" />
+    <meta name="theme-color" content="#000000" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -143,6 +143,144 @@
         .min-h-screen {
           min-height: 100vh;
         }
+      }
+
+      /* ===== VIRAL ANIMATIONS ===== */
+      
+      /* Breath Stars: bloom on inhale */
+      @keyframes star-bloom {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: scale(3) rotate(180deg);
+          opacity: 0;
+        }
+      }
+      
+      .animate-star-bloom {
+        animation: star-bloom 2s ease-out forwards;
+      }
+
+      /* Gentle Float: for gratitude words */
+      @keyframes gentle-float {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-10px) rotate(2deg);
+        }
+      }
+      
+      .animate-gentle-float {
+        animation: gentle-float 3s ease-in-out infinite;
+      }
+
+      /* Twinkle: for background stars */
+      @keyframes twinkle {
+        0%, 100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.5);
+        }
+      }
+      
+      .animate-twinkle {
+        animation: twinkle 3s ease-in-out infinite;
+      }
+
+      /* Scale In: for achievement unlock */
+      @keyframes scale-in {
+        0% {
+          transform: scale(0.5) rotate(-10deg);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.05) rotate(2deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+      }
+      
+      .animate-scale-in {
+        animation: scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+
+      /* Confetti: achievement celebration */
+      @keyframes confetti {
+        0% {
+          transform: translateY(-10px) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+      
+      .animate-confetti {
+        animation: confetti 2s ease-in forwards;
+      }
+
+      /* Gentle Pulse: for constellation stars */
+      @keyframes gentle-pulse {
+        0%, 100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.1);
+        }
+      }
+      
+      .animate-gentle-pulse {
+        animation: gentle-pulse 2s ease-in-out infinite;
+      }
+
+      /* Particle Float: for landing page */
+      @keyframes particle-float {
+        0% {
+          transform: translateY(0px) translateX(0px);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(20px);
+          opacity: 0;
+        }
+      }
+      
+      .animate-particle-float {
+        animation: particle-float 6s linear infinite;
+      }
+
+      /* Fade In: smooth entrance */
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      
+      .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
       }
     </style>
   <script type="importmap">

@@ -16,20 +16,21 @@ const SIZE_CLASSES = {
   xl: 'w-48 h-48'
 };
 
+// Official KAYA orb design - teal with white center
 const VARIANT_CLASSES = {
-  gold: 'from-yellow-400 via-amber-400 to-orange-400',
-  violet: 'from-purple-400 via-violet-500 to-indigo-500',
-  emerald: 'from-emerald-400 via-teal-500 to-cyan-500',
-  rose: 'from-rose-400 via-pink-500 to-fuchsia-500',
-  cyan: 'from-cyan-400 via-teal-400 to-blue-500'
+  gold: 'from-cyan-400 via-teal-400 to-cyan-500',
+  violet: 'from-cyan-400 via-teal-400 to-cyan-500',
+  emerald: 'from-cyan-400 via-teal-400 to-cyan-500',
+  rose: 'from-cyan-400 via-teal-400 to-cyan-500',
+  cyan: 'from-cyan-400 via-teal-400 to-cyan-500'
 };
 
 const GLOW_CLASSES = {
-  gold: 'shadow-[0_0_30px_rgba(251,191,36,0.6)]',
-  violet: 'shadow-[0_0_30px_rgba(139,92,246,0.6)]',
-  emerald: 'shadow-[0_0_30px_rgba(20,184,166,0.6)]',
-  rose: 'shadow-[0_0_30px_rgba(244,114,182,0.6)]',
-  cyan: 'shadow-[0_0_30px_rgba(6,182,212,0.6)]'
+  gold: 'shadow-[0_0_80px_rgba(6,182,212,0.8),0_0_120px_rgba(20,184,166,0.6)]',
+  violet: 'shadow-[0_0_80px_rgba(6,182,212,0.8),0_0_120px_rgba(20,184,166,0.6)]',
+  emerald: 'shadow-[0_0_80px_rgba(6,182,212,0.8),0_0_120px_rgba(20,184,166,0.6)]',
+  rose: 'shadow-[0_0_80px_rgba(6,182,212,0.8),0_0_120px_rgba(20,184,166,0.6)]',
+  cyan: 'shadow-[0_0_80px_rgba(6,182,212,0.8),0_0_120px_rgba(20,184,166,0.6)]'
 };
 
 const INTENSITY_DURATION = {
@@ -57,15 +58,22 @@ const PulsingOrb: React.FC<PulsingOrbProps> = ({
       onClick={onClick}
     >
       {/* Outer glow ring */}
-      <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${variantClass} opacity-20 blur-2xl ${animationClass}`}></div>
+      <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${variantClass} opacity-40 blur-2xl ${animationClass}`}></div>
       
-      {/* Main orb */}
+      {/* Main orb - Official KAYA design */}
       <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${variantClass} ${glowClass} ${animationClass} flex items-center justify-center`}>
-        {/* Inner highlight */}
-        <div className="absolute top-2 left-2 w-1/3 h-1/3 bg-white/30 rounded-full blur-md"></div>
+        {/* White center glow */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-5/12 h-5/12 rounded-full bg-white/90 blur-lg animate-core-pulse"></div>
+        </div>
         
-        {/* Content */}
-        <div className="relative z-10 flex items-center justify-center w-full h-full text-white">
+        {/* White center core */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-1/4 h-1/4 rounded-full bg-white"></div>
+        </div>
+        
+        {/* Content overlay */}
+        <div className="relative z-10 flex items-center justify-center w-full h-full text-cyan-900 font-semibold">
           {children}
         </div>
       </div>

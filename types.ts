@@ -114,7 +114,7 @@ export interface PersonalizedSessionData {
 }
 
 
-export type ActivityType = 'meditation' | 'breathwork' | 'soundscape' | 'subliminal' | 'affirmation' | 'sleep-story';
+export type ActivityType = 'breathwork' | 'soundscape' | 'subliminal' | 'affirmation' | 'sleep-story';
 
 export interface SubliminalItem {
   title: string;
@@ -142,9 +142,8 @@ export type Activity =
   | { type: 'sleep-story'; data: SleepStoryItem };
 
 
-// AppView types - internal routing (keep technical names for routing)
-// Display names mapped in components using FEATURE_DISPLAY_NAMES constant
-export type AppView = 'landing' | 'stellarHome' | 'cosmicLibrary' | 'reflectionChamber' | 'stellarStories' | 'stellarAtlas' | 'setup' | 'constellation' | 'mindspace' | 'completion' | 'affirmation' | 'setupComplete' | 'pathwayComplete' | 'guidingStars' | 'eventHorizon' | 'galaxyArchive' | 'orbitInsights' | 'universe' | 'stellarSystem' | 'pricing' | 'auth' | 'verification' | 'dashboard' | 'explore' | 'journal' | 'sleepStories' | 'community' | 'profile' | 'gamification' | 'therapists' | 'events' | 'resources' | 'insights' | 'session' | 'programComplete' | 'audioTest';
+// AppView types - simplified and consolidated
+export type AppView = 'landing' | 'dashboard' | 'explore' | 'community' | 'profile' | 'universe' | 'breathingIntro' | 'setup' | 'completion' | 'affirmation' | 'setupComplete' | 'programComplete' | 'pricing' | 'auth' | 'verification' | 'sleepStories' | 'gamification' | 'therapists' | 'events' | 'resources' | 'insights' | 'session' | 'audioTest' | 'trivia' | 'journal';
 
 export interface ChatMessage {
   author: 'user' | 'kaya';
@@ -182,7 +181,7 @@ export interface Therapist {
 export interface WellnessEvent {
   id: string;
   title: string;
-  category: 'workshop' | 'meditation' | 'yoga' | 'support-group' | 'retreat' | 'webinar' | 'fitness';
+  category: 'workshop' | 'breathwork' | 'yoga' | 'support-group' | 'retreat' | 'webinar' | 'fitness';
   description: string;
   date: string;
   time: string;

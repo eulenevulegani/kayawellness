@@ -233,7 +233,7 @@ const WellnessEvents: React.FC<WellnessEventsProps> = ({ onBack }) => {
               <button
                 onClick={() => setSelectedCategory('all')}
                 className={`px-3 py-1.5 rounded-full text-sm transition ${
-                  selectedCategory === 'all' ? 'bg-cyan-400 text-cyan-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                  selectedCategory === 'all' ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
                 }`}
               >
                 All
@@ -243,7 +243,7 @@ const WellnessEvents: React.FC<WellnessEventsProps> = ({ onBack }) => {
                   key={key}
                   onClick={() => setSelectedCategory(key)}
                   className={`px-3 py-1.5 rounded-full text-sm transition ${
-                    selectedCategory === key ? 'bg-cyan-400 text-cyan-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                    selectedCategory === key ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
                   }`}
                 >
                   {label}
@@ -256,7 +256,7 @@ const WellnessEvents: React.FC<WellnessEventsProps> = ({ onBack }) => {
             <button
               onClick={() => setSelectedLocationType('all')}
               className={`px-3 py-1.5 rounded-full text-sm transition ${
-                selectedLocationType === 'all' ? 'bg-white text-blue-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                selectedLocationType === 'all' ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
               }`}
             >
               All Locations
@@ -264,7 +264,7 @@ const WellnessEvents: React.FC<WellnessEventsProps> = ({ onBack }) => {
             <button
               onClick={() => setSelectedLocationType('virtual')}
               className={`px-3 py-1.5 rounded-full text-sm transition ${
-                selectedLocationType === 'virtual' ? 'bg-white text-blue-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                selectedLocationType === 'virtual' ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
               }`}
             >
               💻 Virtual
@@ -272,7 +272,7 @@ const WellnessEvents: React.FC<WellnessEventsProps> = ({ onBack }) => {
             <button
               onClick={() => setSelectedLocationType('in-person')}
               className={`px-3 py-1.5 rounded-full text-sm transition ${
-                selectedLocationType === 'in-person' ? 'bg-white text-blue-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                selectedLocationType === 'in-person' ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
               }`}
             >
               📍 In-Person
@@ -368,7 +368,7 @@ const WellnessEvents: React.FC<WellnessEventsProps> = ({ onBack }) => {
                     >
                       {expandedId === event.id ? 'Less' : 'Details'}
                     </button>
-                    <button className="px-4 py-1.5 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded font-semibold text-xs hover:opacity-90 transition">
+                    <button className="px-4 py-1.5 bg-white text-black rounded font-semibold text-xs hover:bg-white/90 transition">
                       Register
                     </button>
                   </div>

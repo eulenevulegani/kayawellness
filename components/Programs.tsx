@@ -14,7 +14,7 @@ interface ExploreProps {
   userProfile: UserProfile;
 }
 
-type ExploreTab = 'journeys' | 'meditate' | 'breathe' | 'frequencies' | 'sleep';
+type ExploreTab = 'journeys' | 'breathe' | 'soundscapes' | 'frequencies' | 'sleep';
 const MOODS = ['Stress', 'Anxiety', 'Focus', 'Sleep', 'Gratitude'];
 
 const TabButton: React.FC<{
@@ -110,8 +110,8 @@ const Explore: React.FC<ExploreProps> = ({ programs, onStartProgram, onStartActi
 
   const TABS: { id: ExploreTab; label: string; icon: React.ReactNode }[] = [
     { id: 'journeys', label: 'Journeys', icon: <StarIcon className="w-6 h-6" /> },
-    { id: 'meditate', label: 'Meditate', icon: <LotusIcon className="w-6 h-6" /> },
     { id: 'breathe', label: 'Breathe', icon: <LungIcon className="w-6 h-6" /> },
+    { id: 'soundscapes', label: 'Soundscapes', icon: <SoundIcon className="w-6 h-6" /> },
     { id: 'frequencies', label: 'Frequencies', icon: <SoundIcon className="w-6 h-6" /> },
     { id: 'sleep', label: 'Sleep', icon: <MoonIcon className="w-6 h-6" /> },
   ];
@@ -155,8 +155,8 @@ const Explore: React.FC<ExploreProps> = ({ programs, onStartProgram, onStartActi
                     ))}
                 </div>
             );
-        case 'meditate':
-            return <ToolList mood={selectedMood} fetcher={getMeditationsForMood} type="meditation" onStartActivity={onStartActivity} icon={<LotusIcon className="w-4 h-4" />} isPremium={isPremium} onUpgradeClick={() => onNavigate('profile')}/>;
+        case 'soundscapes':
+            return <ToolList mood={selectedMood} fetcher={getSoundscapesForMood} type="soundscape" onStartActivity={onStartActivity} icon={<SoundIcon className="w-4 h-4" />} isPremium={isPremium} onUpgradeClick={() => onNavigate('profile')}/>;
         case 'breathe':
             return <ToolList mood={selectedMood} fetcher={getBreathworkForMood} type="breathwork" onStartActivity={onStartActivity} icon={<LungIcon className="w-4 h-4" />} isPremium={isPremium} onUpgradeClick={() => onNavigate('profile')}/>;
         case 'frequencies':
@@ -255,7 +255,7 @@ const Explore: React.FC<ExploreProps> = ({ programs, onStartProgram, onStartActi
         ))}
       </div>
 
-      {(activeTab === 'meditate' || activeTab === 'breathe') && (
+      {(activeTab === 'soundscapes' || activeTab === 'breathe') && (
           <div className="mb-4">
               <label className="text-sm text-white/70 mb-2 block">Show me practices for:</label>
               <div className="flex flex-wrap gap-2">

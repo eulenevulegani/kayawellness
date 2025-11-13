@@ -108,7 +108,7 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
       <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center" key={currentStageIndex}>
         {/* Outer glow layers */}
         <div 
-          className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/30 via-blue-500/20 to-teal-400/30 opacity-40 blur-[60px] transition-all ease-linear"
+          className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 opacity-40 blur-[60px] transition-all ease-linear"
           style={{ 
             transitionDuration: `${currentStage.duration}ms`,
             transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.25)' : 'scale(0.85)',
@@ -117,7 +117,7 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
         ></div>
         
         <div 
-          className="absolute inset-8 rounded-full bg-gradient-to-br from-cyan-300/40 via-teal-400/30 to-blue-400/40 opacity-50 blur-[40px] transition-all ease-linear"
+          className="absolute inset-8 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 opacity-50 blur-[40px] transition-all ease-linear"
           style={{ 
             transitionDuration: `${currentStage.duration}ms`,
             transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.2)' : 'scale(0.85)',
@@ -141,7 +141,7 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
         {/* Main orb */}
         <div className="relative z-10">
           <div
-            className="w-40 h-40 sm:w-48 sm:h-48 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-cyan-400/80 via-teal-500/70 to-blue-500/80 backdrop-blur-xl flex items-center justify-center transition-all ease-linear"
+            className="w-40 h-40 sm:w-48 sm:h-48 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 backdrop-blur-xl flex items-center justify-center transition-all ease-linear"
             style={{ 
               transitionDuration: `${currentStage.duration}ms`,
               transform: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 'scale(1.15)' : 'scale(0.85)',
@@ -153,7 +153,7 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
           >
             {/* Inner bright core */}
             <div 
-              className="absolute inset-12 rounded-full bg-gradient-to-br from-white/40 via-cyan-200/30 to-transparent blur-md transition-all ease-linear"
+              className="absolute inset-12 rounded-full bg-gradient-to-br from-cyan-300/60 via-teal-300/50 to-transparent blur-md transition-all ease-linear"
               style={{ 
                 transitionDuration: `${currentStage.duration}ms`,
                 opacity: currentStage.name === 'inhale' || currentStage.name === 'hold' ? 0.7 : 0.2,
@@ -198,7 +198,7 @@ const BreathworkAnimator: React.FC<BreathworkAnimatorProps> = ({ breathwork }) =
             key={stage.name + index}
             className={`h-1 rounded-full transition-all duration-500 ${
               index === currentStageIndex 
-                ? 'w-12 bg-gradient-to-r from-cyan-400 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.8)]' 
+                ? 'w-12 bg-gradient-to-r from-cyan-400 to-teal-400 shadow-[0_0_10px_rgba(6,182,212,0.8)]' 
                 : 'w-8 bg-white/20'
             }`}
           />

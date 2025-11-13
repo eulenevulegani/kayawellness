@@ -30,26 +30,25 @@ const KayaLogo: React.FC<KayaLogoProps> = ({
       aria-label="KAYA Logo"
     >
       <defs>
-        {/* Main sphere gradient - cyan to teal to blue */}
+        {/* Main sphere gradient - standard KAYA teal */}
         <radialGradient id={`sphereGradient-${size}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#7dd3fc" stopOpacity="1"/>
-          <stop offset="30%" stopColor="#22d3ee" stopOpacity="1"/>
-          <stop offset="55%" stopColor="#14b8a6" stopOpacity="1"/>
-          <stop offset="80%" stopColor="#0d9488" stopOpacity="1"/>
-          <stop offset="100%" stopColor="#3b82f6" stopOpacity="1"/>
+          <stop offset="0%" stopColor="#2dd4bf" stopOpacity="1"/>
+          <stop offset="40%" stopColor="#22d3ee" stopOpacity="1"/>
+          <stop offset="70%" stopColor="#14b8a6" stopOpacity="1"/>
+          <stop offset="100%" stopColor="#06b6d4" stopOpacity="1"/>
         </radialGradient>
         
         {/* Soft outer glow */}
         <radialGradient id={`outerGlow-${size}`} cx="50%" cy="50%" r="50%">
           <stop offset="85%" stopColor="#22d3ee" stopOpacity="0"/>
-          <stop offset="95%" stopColor="#22d3ee" stopOpacity="0.15"/>
+          <stop offset="95%" stopColor="#22d3ee" stopOpacity="0.2"/>
           <stop offset="100%" stopColor="#06b6d4" stopOpacity="0"/>
         </radialGradient>
         
         {/* Subtle highlight overlay */}
         <radialGradient id={`highlight-${size}`} cx="50%" cy="35%" r="40%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.25"/>
-          <stop offset="60%" stopColor="#ffffff" stopOpacity="0.05"/>
+          <stop offset="0%" stopColor="#5eead4" stopOpacity="0.3"/>
+          <stop offset="60%" stopColor="#2dd4bf" stopOpacity="0.1"/>
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
         </radialGradient>
       </defs>

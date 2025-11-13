@@ -8,6 +8,8 @@ import contextService, { UserContext } from '../services/contextService';
 import Loader from './Loader';
 import { MicrophoneIcon, StarIcon, LotusIcon, KayaIcon } from './Icons';
 import PersonalGrowthTree from './PersonalGrowthTree';
+import ConstellationStreak from './ConstellationStreak';
+import GratitudeSkyFeed from './GratitudeSkyFeed';
 
 interface DashboardProps {
   userProfile: UserProfile;
@@ -157,7 +159,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, achievements, sessio
                             <p className="font-semibold text-white mt-1">{mostRecentAchievement.title}</p>
                         </div>
                     </div>
-                    <button onClick={() => onNavigate('journal')} className="text-sm text-white/70 hover:text-white underline flex-shrink-0">View All</button>
                 </div>
             </div>
         );
@@ -285,6 +286,18 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, achievements, sessio
         </div>
 
         <RecentAchievement />
+
+        {/* Viral Features: Show after mood selection or on main screen */}
+        {!selectedMood && sessionHistory.length > 0 && (
+          <div className="mt-6 space-y-4">
+            {/* Constellation Streak */}
+            <ConstellationStreak 
+              currentStreak={calculateStreak(sessionHistory)}
+              longestStreak={userProfile.longestStreak || calculateStreak(sessionHistory)}
+              onStreakTap={() => console.log('🔥 Streak tapped')}
+            />
+          </div>
+        )}
         
         <style>{`
             @keyframes pulse-orb {
@@ -297,6 +310,34 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, achievements, sessio
         `}</style>
       </div>
     );
+};
+
+// Helper function to calculate current streak
+const calculateStreak = (sessionHistory: SessionHistoryEntry[]): number => {
+  if (!sessionHistory || sessionHistory.length === 0) return 0;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  let streak = 0;
+  const sortedSessions = [...sessionHistory].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  
+  for (const session of sortedSessions) {
+    const sessionDate = new Date(session.date);
+    sessionDate.setHours(0, 0, 0, 0);
+    
+    const daysDiff = Math.floor((today.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysDiff === streak) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  
+  return streak;
 };
 
 export default Dashboard;

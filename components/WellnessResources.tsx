@@ -194,7 +194,7 @@ const WellnessResources: React.FC<WellnessResourcesProps> = ({ subscriptionTier,
               <button
                 onClick={() => setSelectedCategory('all')}
                 className={`px-3 py-1.5 rounded-full text-sm transition ${
-                  selectedCategory === 'all' ? 'bg-cyan-400 text-cyan-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                  selectedCategory === 'all' ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
                 }`}
               >
                 All
@@ -204,7 +204,7 @@ const WellnessResources: React.FC<WellnessResourcesProps> = ({ subscriptionTier,
                   key={category}
                   onClick={() => setSelectedCategory(category)}
                   className={`px-3 py-1.5 rounded-full text-sm transition ${
-                    selectedCategory === category ? 'bg-cyan-400 text-cyan-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                    selectedCategory === category ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
                   }`}
                 >
                   {category}
@@ -219,7 +219,7 @@ const WellnessResources: React.FC<WellnessResourcesProps> = ({ subscriptionTier,
               <button
                 onClick={() => setSelectedType('all')}
                 className={`px-3 py-1.5 rounded-full text-sm transition ${
-                  selectedType === 'all' ? 'bg-white text-blue-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                  selectedType === 'all' ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
                 }`}
               >
                 All Types
@@ -229,7 +229,7 @@ const WellnessResources: React.FC<WellnessResourcesProps> = ({ subscriptionTier,
                   key={type}
                   onClick={() => setSelectedType(type)}
                   className={`px-3 py-1.5 rounded-full text-sm transition ${
-                    selectedType === type ? 'bg-white text-blue-900 font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                    selectedType === type ? 'bg-white text-black font-semibold' : 'bg-white/10 text-white/80 hover:bg-white/20'
                   }`}
                 >
                   {icon} {type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')}
@@ -264,7 +264,7 @@ const WellnessResources: React.FC<WellnessResourcesProps> = ({ subscriptionTier,
                       </div>
                     </div>
                     {isLocked && (
-                      <span className="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded text-xs font-semibold">
+                      <span className="px-2 py-1 bg-white/10 text-white rounded text-xs font-semibold">
                         🔒 Premium
                       </span>
                     )}

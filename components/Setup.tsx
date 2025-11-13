@@ -32,11 +32,11 @@ const ProgressBar: React.FC<{ current: number, total: number }> = ({ current, to
     <div className="mb-8">
         <div className="flex justify-between items-center mb-3">
             <span className="text-sm text-white/70">Step {current} of {total}</span>
-            <span className="text-sm text-cyan-400 font-medium">{Math.round((current / total) * 100)}% Complete</span>
+            <span className="text-sm text-white font-medium">{Math.round((current / total) * 100)}% Complete</span>
         </div>
         <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
             <div 
-                className="h-full bg-gradient-to-r from-cyan-400 to-teal-400 transition-all duration-500 ease-out"
+                className="h-full bg-white transition-all duration-500 ease-out"
                 style={{ width: `${(current / total) * 100}%` }}
             />
         </div>
@@ -64,7 +64,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
   }, []);
 
   const [step, setStep] = useState(1);
-  const totalSteps = 9; // 8 cosmic realms + the sun (you) at the center
+  const totalSteps = 7; // Streamlined setup (removed intro and redundant preferred time)
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -172,20 +172,6 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
       case 1:
         return (
           <div key={1} className="animate-fade-in">
-            <div className="mb-12 text-center">
-                <div className="flex items-center justify-center mx-auto mb-8">
-                    <KayaLogo size={120} animated={true} />
-                </div>
-                <h1 className="text-3xl md:text-4xl font-thin text-white tracking-wide mb-4">Welcome to Your Calm Universe</h1>
-                <p className="text-white/70 text-base max-w-2xl mx-auto leading-relaxed">
-                    You're about to journey through 8 celestial realms—like the 8 planets orbiting your inner sun. Each step brings you closer to your center.
-                </p>
-            </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div key={2} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">What Stars Are You Reaching For?</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
                 Choose the paths that resonate with you
@@ -203,7 +189,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                       key={goal.id}
                       type="button"
                       onClick={() => handleGoalToggle(goal.id)}
-                      className={`px-4 py-3 rounded-xl text-sm transition transform hover:scale-105 active:scale-95 text-left ${goals.includes(goal.id) ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 font-semibold shadow-lg shadow-cyan-500/30' : 'bg-white/10 text-white/80 hover:bg-white/20 border border-white/20'}`}
+                      className={`px-4 py-3 rounded-xl text-sm transition transform hover:scale-105 active:scale-95 text-left ${goals.includes(goal.id) ? 'bg-white text-black font-semibold shadow-lg' : 'bg-white/10 text-white/80 hover:bg-white/20 border border-white/20'}`}
                   >
                       <div className="flex flex-col">
                           <span className="font-semibold text-sm">
@@ -219,9 +205,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 3:
+      case 2:
         return (
-          <div key={3} className="animate-fade-in">
+          <div key={2} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Cosmic Experience</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
               🪐 Planet 3: Understanding your journey level
@@ -229,7 +215,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             <div className="space-y-2.5 max-w-lg mx-auto">
               {EXPERIENCE_LEVELS.map(option => (
                 <button key={option.id} type="button" onClick={() => setExperienceLevel(option.id)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition transform hover:scale-[1.02] ${experienceLevel === option.id ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-400 shadow-lg shadow-cyan-500/20' : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'}`}>
+                  className={`w-full text-left p-4 rounded-xl border-2 transition transform hover:scale-[1.02] ${experienceLevel === option.id ? 'bg-white/15 border-white shadow-lg' : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'}`}>
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">{option.icon}</div>
                     <div className="flex-grow">
@@ -247,9 +233,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 4:
+      case 3:
         return (
-          <div key={4} className="animate-fade-in">
+          <div key={3} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Life Constellation</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
               🌍 Planet 4: Your place in the cosmos
@@ -260,7 +246,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                 <div className="grid grid-cols-2 gap-2.5">
                   {(['18-24', '25-34', '35-44', '45-54', '55+'] as const).map(range => (
                     <button key={range} type="button" onClick={() => setAgeRange(range)}
-                      className={`p-3 rounded-xl border-2 transition ${ageRange === range ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-400' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
+                      className={`p-3 rounded-xl border-2 transition ${ageRange === range ? 'bg-white/15 border-white' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
                       <span className="text-white font-medium text-sm">{range}</span>
                     </button>
                   ))}
@@ -277,9 +263,37 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                     { id: 'other', label: 'Other', emoji: '✨' }
                   ] as const).map(stage => (
                     <button key={stage.id} type="button" onClick={() => setLifeStage(stage.id)}
-                      className={`p-3 rounded-xl border-2 transition text-left flex items-center gap-2.5 ${lifeStage === stage.id ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-400' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
+                      className={`p-3 rounded-xl border-2 transition text-left flex items-center gap-2.5 ${lifeStage === stage.id ? 'bg-white/15 border-white' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
                       <span className="text-xl">{stage.emoji}</span>
                       <span className="text-white font-medium text-xs">{stage.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div key={4} className="animate-fade-in">
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Wellness Rhythm</h2>
+            <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
+              ☄️ Planet 4: Session length preference
+            </p>
+            <div className="space-y-5 max-w-lg mx-auto">
+              <div>
+                <label className="block text-white/80 mb-2 text-xs font-medium">Preferred Session Length</label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {([
+                    { id: '3-5', label: '3-5 min', desc: 'Quick reset' },
+                    { id: '10-15', label: '10-15 min', desc: 'Balanced practice' },
+                    { id: '20-30', label: '20-30 min', desc: 'Deep dive' },
+                    { id: '30+', label: '30+ min', desc: 'Full immersion' }
+                  ] as const).map(length => (
+                    <button key={length.id} type="button" onClick={() => setSessionLengthPreference(length.id)}
+                      className={`p-3 rounded-xl border-2 transition text-left ${sessionLengthPreference === length.id ? 'bg-white/15 border-white' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
+                      <div className="text-white font-medium text-xs">{length.label}</div>
+                      <div className="text-white/60 text-xs mt-0.5">{length.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -290,54 +304,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
       case 5:
         return (
           <div key={5} className="animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Wellness Rhythm</h2>
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Daily Touch Points</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
-              ☄️ Planet 5: Tuning into your natural flow
-            </p>
-            <div className="space-y-5 max-w-lg mx-auto">
-              <div>
-                <label className="block text-white/80 mb-2 text-xs font-medium">Preferred Practice Time</label>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {([
-                    { id: 'morning', label: 'Morning', emoji: '🌅' },
-                    { id: 'afternoon', label: 'Afternoon', emoji: '☀️' },
-                    { id: 'evening', label: 'Evening', emoji: '🌆' },
-                    { id: 'late-night', label: 'Late Night', emoji: '🌙' }
-                  ] as const).map(time => (
-                    <button key={time.id} type="button" onClick={() => setPreferredTime(time.id)}
-                      className={`p-3 rounded-xl border-2 transition ${preferredTime === time.id ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-400' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
-                      <div className="text-xl mb-1">{time.emoji}</div>
-                      <span className="text-white text-xs">{time.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-white/80 mb-2 text-xs font-medium">Session Length</label>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {([
-                    { id: '3-5', label: '3-5 min', desc: 'Quick' },
-                    { id: '10-15', label: '10-15 min', desc: 'Balanced' },
-                    { id: '20-30', label: '20-30 min', desc: 'Deep' },
-                    { id: '30+', label: '30+ min', desc: 'Immersive' }
-                  ] as const).map(length => (
-                    <button key={length.id} type="button" onClick={() => setSessionLengthPreference(length.id)}
-                      className={`p-3 rounded-xl border-2 transition text-left ${sessionLengthPreference === length.id ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-400' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
-                      <div className="text-white font-medium text-xs">{length.label}</div>
-                      <div className="text-white/60 text-xs mt-0.5">{length.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      case 6:
-        return (
-          <div key={6} className="animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Voice Guide</h2>
-            <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
-              🎵 Planet 6: Choose the voice that resonates with you
+              ⭐ Planet 5: When the universe calls you
             </p>
             <div className="max-w-lg mx-auto">
               <label className="block text-white/80 mb-2 text-xs font-medium text-center">Voice Preference (Optional)</label>
@@ -349,7 +318,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                   { id: 'no-preference', label: 'Surprise Me', emoji: '🎲' }
                 ] as const).map(voice => (
                   <button key={voice.id} type="button" onClick={() => setVoicePreference(voice.id)}
-                    className={`p-3.5 rounded-xl border-2 transition transform hover:scale-[1.02] ${voicePreference === voice.id ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-400 shadow-lg' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
+                    className={`p-3.5 rounded-xl border-2 transition transform hover:scale-[1.02] ${voicePreference === voice.id ? 'bg-white/15 border-white shadow-lg' : 'border-white/20 bg-white/5 hover:border-white/40'}`}>
                     <div className="text-2xl mb-1.5">{voice.emoji}</div>
                     <span className="text-white font-medium text-xs">{voice.label}</span>
                   </button>
@@ -358,9 +327,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 7:
+      case 6:
         return (
-          <div key={7} className="animate-fade-in">
+          <div key={6} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Daily Touch Points</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
               🌟 Planet 7: When the universe calls you
@@ -384,7 +353,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                     disabled={isPremiumOption}
                     className={`p-3.5 rounded-xl transition text-left transform hover:scale-[1.02] ${
                       isSelected
-                      ? 'bg-gradient-to-br from-cyan-400 to-teal-400 text-cyan-900 font-semibold shadow-lg' 
+                      ? 'bg-white text-black font-semibold shadow-lg' 
                       : isPremiumOption
                       ? 'bg-white/5 text-white/40 border border-white/10 cursor-not-allowed'
                       : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
@@ -412,9 +381,9 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 8:
+      case 6:
         return (
-          <div key={8} className="animate-fade-in">
+          <div key={6} className="animate-fade-in">
             <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Your Cosmic Schedule</h2>
             <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
               🌞 Planet 8: Aligning with your sun and moon
@@ -453,12 +422,12 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             </div>
           </div>
         );
-      case 9:
+      case 7:
         return (
-          <div key={9} className="animate-fade-in">
+          <div key={7} className="animate-fade-in">
             <div className="mb-6 text-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/30 to-orange-500/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse shadow-2xl shadow-yellow-500/30">
-                <div className="w-18 h-18 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-pulse shadow-2xl shadow-white/30">
+                <div className="w-18 h-18 bg-white/80 rounded-full flex items-center justify-center">
                   <span className="text-3xl">☀️</span>
                 </div>
               </div>
@@ -518,7 +487,7 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                 />
                 <p className="mt-1.5 text-xs text-white/50">Your secure key to your wellness universe</p>
               </div>
-              <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-400/30 rounded-xl p-5 text-center mt-6">
+              <div className="bg-white/10 border border-white/30 rounded-xl p-5 text-center mt-6">
                 <p className="text-yellow-300 font-medium mb-2">
                   ✨ Almost There!
                 </p>
@@ -555,14 +524,19 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
                     <button
                         type="submit"
                         disabled={isContinueDisabled()}
-                        className={`w-full px-12 py-4 rounded-full font-bold text-lg hover:opacity-90 transform hover:scale-105 transition duration-300 disabled:opacity-30 disabled:scale-100 disabled:cursor-not-allowed ${
-                          step === 9 
-                            ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-orange-900 shadow-lg shadow-yellow-500/30'
-                            : 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 shadow-lg shadow-cyan-500/30'
-                        }`}
+                        className={`w-full px-12 py-4 rounded-full font-bold text-lg transition duration-300 ${
+                          isContinueDisabled()
+                            ? 'bg-white/20 text-white/40 cursor-not-allowed'
+                            : 'bg-white text-black shadow-2xl hover:opacity-90 transform hover:scale-105'
+                        } ${step === 9 ? 'shadow-yellow-400/50' : ''}`}
                     >
                         {step === 9 ? '☀️ Illuminate Your Universe' : 'Journey Onward'}
                     </button>
+                    {isContinueDisabled() && step === 9 && (
+                        <p className="text-center text-white/50 text-xs mt-3">
+                            Fill in all fields to continue (name 2+ chars, valid email, password 8+ chars)
+                        </p>
+                    )}
                 </div>
             </div>
         </form>

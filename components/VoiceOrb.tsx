@@ -28,28 +28,32 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({ onVoiceStart, onVoiceEnd, isListeni
     <div className="fixed bottom-24 right-6 z-50">
       <button
         onClick={handleClick}
-        className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${
+        className={`relative w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 via-teal-400 to-cyan-500 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
           isListening 
-            ? 'from-rose-500 via-red-500 to-pink-600 shadow-[0_0_30px_rgba(244,63,94,0.8)]' 
-            : 'from-cyan-500 via-teal-500 to-blue-600 shadow-[0_0_20px_rgba(6,182,212,0.6)]'
-        } flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95`}
+            ? 'shadow-[0_0_80px_rgba(6,182,212,0.9),0_0_120px_rgba(20,184,166,0.7)]' 
+            : 'shadow-[0_0_60px_rgba(6,182,212,0.7),0_0_90px_rgba(20,184,166,0.5)]'
+        }`}
         aria-label={isListening ? 'Stop listening' : 'Start voice input'}
       >
+        {/* White center glow */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className={`rounded-full bg-white/90 blur-md ${
+            isListening ? 'w-10 h-10 animate-pulse' : 'w-8 h-8 animate-orb-breathe'
+          }`}></div>
+        </div>
+
         {/* Pulse rings when listening */}
         {isListening && (
           <>
-            <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-75"></div>
-            <div className="absolute inset-0 rounded-full bg-red-400 animate-pulse opacity-50"></div>
+            <div className="absolute inset-0 rounded-full bg-cyan-400/50 animate-ping opacity-75"></div>
+            <div className="absolute inset-0 rounded-full bg-teal-400/30 animate-pulse opacity-50"></div>
           </>
         )}
 
-        {/* Icon */}
-        <MicrophoneIcon className={`w-7 h-7 text-white relative z-10 ${isListening ? 'animate-pulse' : ''}`} />
-
-        {/* Glow effect */}
-        <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${
-          isListening ? 'from-red-400 to-pink-500' : 'from-cyan-400 to-teal-500'
-        } blur-xl opacity-30 ${isListening ? 'animate-pulse' : 'animate-orb-breathe'}`}></div>
+        {/* Icon with white background */}
+        <div className="relative z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center">
+          <MicrophoneIcon className={`w-5 h-5 text-cyan-600 ${isListening ? 'animate-pulse' : ''}`} />
+        </div>
       </button>
 
       {/* Tooltip */}

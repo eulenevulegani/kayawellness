@@ -39,7 +39,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onSignupRedirect
       <div className="flex gap-3 mb-8 w-full max-w-md">
         <button
           type="button"
-          className="flex-1 py-3 px-6 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold shadow-lg"
+          className="flex-1 py-3 px-6 bg-white text-black rounded-full font-semibold shadow-lg hover:bg-white/90 transition"
         >
           Login
         </button>
@@ -93,7 +93,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, onSignupRedirect
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-bold text-base hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="w-full py-3.5 px-4 bg-white text-black rounded-full font-bold text-base hover:bg-white/90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>

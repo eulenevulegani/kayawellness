@@ -22,51 +22,65 @@ class UserService {
         throw new Error('User not authenticated');
       }
 
-      const { data: profile, error } = await supabase
+      console.log('🔍 Fetching profile for user:', user.id);
+
+      const { data: profiles, error } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', user.id)
-        .single();
+        .eq('id', user.id);
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // Profile doesn't exist
-          return null;
-        }
+        console.error('❌ Supabase error:', error);
         throw error;
       }
 
-      // Convert from snake_case to camelCase
-      return {
-        name: profile.name,
-        sessionLength: profile.session_length,
-        goals: profile.goals,
-        checkInTimes: profile.check_in_times,
-        lifestyle: profile.lifestyle,
-        activeProgramId: profile.active_program_id,
-        programProgress: profile.program_progress,
-        completedPrograms: profile.completed_programs,
-        subscriptionTier: profile.subscription_tier,
-        lastSessionDate: profile.last_session_date,
-        streak: profile.streak,
-        xp: profile.xp,
-        level: profile.level,
-        supportPreferences: profile.support_preferences,
-        experienceLevel: profile.experience_level,
+      if (!profiles || profiles.length === 0) {
+        console.log('⚠️ No profile found for user:', user.id);
+        return null;
+      }
+
+      const profile = profiles[0];
+
+      // Convert from snake_case to camelCase with defaults
+      console.log('📝 Raw profile from database:', { 
+        name: profile.name, 
+        goals: profile.goals, 
+        session_length: profile.session_length 
+      });
+      
+      const userProfile: UserProfile = {
+        name: profile.name || '',
+        sessionLength: profile.session_length || 'medium',
+        goals: Array.isArray(profile.goals) ? profile.goals : [],
+        checkInTimes: Array.isArray(profile.check_in_times) ? profile.check_in_times : [],
+        lifestyle: profile.lifestyle || 'balanced',
+        activeProgramId: profile.active_program_id || undefined,
+        programProgress: profile.program_progress || 0,
+        completedPrograms: Array.isArray(profile.completed_programs) ? profile.completed_programs : [],
+        subscriptionTier: profile.subscription_tier || 'free',
+        lastSessionDate: profile.last_session_date || undefined,
+        streak: profile.streak || 0,
+        xp: profile.xp || 0,
+        level: profile.level || 1,
+        supportPreferences: Array.isArray(profile.support_preferences) ? profile.support_preferences : [],
+        experienceLevel: profile.experience_level || 'beginner',
         notificationPreferences: {
-          enabled: profile.notifications_enabled,
-          checkInReminders: profile.check_in_reminders,
-          streakProtection: profile.streak_protection,
-          milestoneAlerts: profile.milestone_alerts,
-          challengeUpdates: profile.challenge_updates,
-          therapistQA: profile.therapist_qa,
-          calendarSync: profile.calendar_sync,
-          quietHoursStart: profile.quiet_hours_start,
-          quietHoursEnd: profile.quiet_hours_end
+          enabled: profile.notifications_enabled !== false,
+          checkInReminders: profile.check_in_reminders !== false,
+          streakProtection: profile.streak_protection !== false,
+          milestoneAlerts: profile.milestone_alerts !== false,
+          challengeUpdates: profile.challenge_updates !== false,
+          therapistQA: profile.therapist_qa !== false,
+          calendarSync: profile.calendar_sync === true,
+          quietHoursStart: profile.quiet_hours_start || '22:00',
+          quietHoursEnd: profile.quiet_hours_end || '07:00'
         },
-        joinedChallenges: profile.joined_challenges,
-        supportGroups: profile.support_groups
+        joinedChallenges: Array.isArray(profile.joined_challenges) ? profile.joined_challenges : [],
+        supportGroups: Array.isArray(profile.support_groups) ? profile.support_groups : []
       };
+
+      console.log('✅ Profile loaded successfully:', userProfile.name);
+      return userProfile;
     } catch (error: any) {
       console.error('Failed to get profile from Supabase:', error);
       throw new Error(error.message || 'Failed to get profile');
