@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { AppView, UserProfile, SessionHistoryEntry, Achievement, WellnessProgram, GratitudeEntry, Activity, PersonalizedSessionData } from './types';
 import Profile from './components/Profile';
 import SleepStories from './components/SleepStory';
-import Setup from './components/Setup';
 import Explore from './components/Programs';
 import Community from './components/Community';
 import Dashboard from './components/Journey';
@@ -12,7 +11,7 @@ import PersonalizedSession from './components/PersonalizedSession';
 import PostSessionScreen from './components/PostSessionScreen';
 import LandingPage from './components/LandingPage';
 import Affirmation from './components/Affirmation';
-import SetupComplete from './components/SetupComplete';
+import Setup from './components/Setup';
 import ProgramComplete from './components/ProgramComplete';
 import TherapistMatcher from './components/TherapistMatcher';
 import ConstellationStreak from './components/ConstellationStreak';
@@ -348,6 +347,13 @@ const App: React.FC = () => {
       checkContext();
     }
   }, [view, userProfile?.name]);
+
+  // Redirect any legacy 'setupComplete' view to 'dashboard' since the SetupComplete UI was removed
+  useEffect(() => {
+    if (view === 'setupComplete') {
+      setView('dashboard');
+    }
+  }, [view]);
 
   const handleAddXp = async (amount: number, source: string = 'general') => {
     try {
@@ -728,7 +734,6 @@ const App: React.FC = () => {
 
     return (
       <>
-        {view === 'setupComplete' && <SetupComplete userName={userProfile.name} onContinue={handleSetupConfirmed} />}
         {view === 'dashboard' && (
           <Dashboard
             userProfile={userProfile}

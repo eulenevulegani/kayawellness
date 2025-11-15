@@ -9,15 +9,10 @@ interface SetupProps {
 }
 
 const ALL_GOALS = [
-  { id: 'stress', label: 'Navigate to Serenity', subtitle: 'Manage daily stress' },
-  { id: 'sleep', label: 'Journey to Restful Realms', subtitle: 'Improve sleep quality' },
-  { id: 'grounded', label: 'Find Your Center', subtitle: 'Stay grounded & present' },
-  { id: 'gratitude', label: 'Cultivate Cosmic Gratitude', subtitle: 'Practice gratitude daily' },
-  { id: 'anxiety', label: 'Calm the Cosmic Storm', subtitle: 'Manage anxiety' },
-  { id: 'focus', label: 'Sharpen Stellar Focus', subtitle: 'Increase concentration' },
-  { id: 'resilience', label: 'Strengthen Stellar Core', subtitle: 'Build inner resilience' },
-  { id: 'balance', label: 'Harmonize Your Orbit', subtitle: 'Work-life balance' },
-  { id: 'self-love', label: 'Radiate Inner Light', subtitle: 'Cultivate self-love' }
+  { id: 'stress', label: 'Stress Relief' },
+  { id: 'sleep', label: 'Better Sleep' },
+  { id: 'gratitude', label: 'Gratitude' },
+  { id: 'focus', label: 'Focus' }
 ];
 const CHECK_IN_OPTIONS: ('morning' | 'midday' | 'night' | 'personalized')[] = ['morning', 'midday', 'night', 'personalized'];
 // lifestyle options removed to streamline setup flow
@@ -172,35 +167,17 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
       case 1:
         return (
           <div key={1} className="animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">What Stars Are You Reaching For?</h2>
-            <p className="text-white/60 mb-6 text-center max-w-2xl mx-auto text-sm">
-                Choose the paths that resonate with you
-            </p>
-            {goals.length > 0 && (
-                <div className="mb-4 text-center">
-                    <span className="inline-block px-3 py-1.5 bg-cyan-400/20 text-cyan-300 rounded-full text-xs font-medium">
-                        {goals.length} {goals.length === 1 ? 'goal' : 'goals'} selected ✨
-                    </span>
-                </div>
-            )}
-            <div className="flex flex-wrap gap-2.5 justify-center max-w-3xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-center">Pick your focus areas</h2>
+            <div className="flex flex-wrap gap-3 justify-center max-w-2xl mx-auto">
               {ALL_GOALS.map((goal) => (
-                  <button
-                      key={goal.id}
-                      type="button"
-                      onClick={() => handleGoalToggle(goal.id)}
-                      className={`px-4 py-3 rounded-xl text-sm transition transform hover:scale-105 active:scale-95 text-left ${goals.includes(goal.id) ? 'bg-white text-black font-semibold shadow-lg' : 'bg-white/10 text-white/80 hover:bg-white/20 border border-white/20'}`}
-                  >
-                      <div className="flex flex-col">
-                          <span className="font-semibold text-sm">
-                              {goals.includes(goal.id) && '✨ '}
-                              {goal.label}
-                          </span>
-                          <span className={`text-xs mt-0.5 ${goals.includes(goal.id) ? 'text-cyan-800' : 'text-white/60'}`}>
-                              {goal.subtitle}
-                          </span>
-                      </div>
-                  </button>
+                <button
+                  key={goal.id}
+                  type="button"
+                  onClick={() => handleGoalToggle(goal.id)}
+                  className={`px-5 py-3 rounded-lg text-base font-medium transition hover:scale-105 active:scale-95 ${goals.includes(goal.id) ? 'bg-white text-black shadow-lg' : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'}`}
+                >
+                  {goals.includes(goal.id) && '✨ '}{goal.label}
+                </button>
               ))}
             </div>
           </div>
@@ -522,15 +499,15 @@ const Setup: React.FC<SetupProps> = ({ onComplete }) => {
             <div className="flex-shrink-0 p-4">
                 <div className="w-full max-w-md mx-auto">
                     <button
-                        type="submit"
-                        disabled={isContinueDisabled()}
-                        className={`w-full px-12 py-4 rounded-full font-bold text-lg transition duration-300 ${
-                          isContinueDisabled()
-                            ? 'bg-white/20 text-white/40 cursor-not-allowed'
-                            : 'bg-white text-black shadow-2xl hover:opacity-90 transform hover:scale-105'
-                        } ${step === 8 ? 'shadow-yellow-400/50' : ''}`}
+                      type="submit"
+                      disabled={isContinueDisabled()}
+                      className={`w-full px-8 py-3 rounded-full font-semibold text-base transition duration-300 ${
+                        isContinueDisabled()
+                        ? 'bg-white/20 text-white/40 cursor-not-allowed'
+                        : 'bg-white text-black hover:opacity-90'
+                      } ${step === 8 ? 'shadow-yellow-400/50' : ''}`}
                     >
-                        {step === 8 ? '☀️ Illuminate Your Universe' : 'Journey Onward'}
+                      {step === 8 ? '☀️ Illuminate Your Universe' : 'Continue'}
                     </button>
                     {isContinueDisabled() && step === 8 && (
                         <p className="text-center text-white/50 text-xs mt-3">

@@ -60,9 +60,10 @@ const TRIVIA_QUESTIONS: TriviaQuestion[] = [
 interface QuickWinTriviaProps {
   onComplete: (earnedPoints: number) => void;
   onSkip: () => void;
+  compact?: boolean;
 }
 
-const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip }) => {
+const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip, compact = false }) => {
   const [currentQuestion, setCurrentQuestion] = useState<TriviaQuestion | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -98,38 +99,38 @@ const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip }) =
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg animate-fade-in">
-      <div className="w-full max-w-md mx-4">
-        <div className="bg-gradient-to-br from-black via-slate-900 to-black border border-white/20 rounded-3xl p-8 shadow-2xl">
+      <div className={`w-full mx-4 ${compact ? 'max-w-sm' : 'max-w-md'}`}>
+        <div className={`bg-gradient-to-br from-black via-cyan-950 to-black border border-cyan-400/20 rounded-3xl ${compact ? 'p-4' : 'p-8'} shadow-2xl`}>
           {/* Header */}
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-full flex items-center justify-center animate-gentle-pulse">
-              <SparklesIcon className="w-8 h-8 text-teal-300" />
+          <div className={`text-center mb-6 ${compact ? 'mb-4' : ''}`}>
+            <div className={`${compact ? 'w-12 h-12 mb-3' : 'w-16 h-16 mb-4'} mx-auto bg-gradient-to-br from-cyan-400/30 to-teal-400/30 rounded-full flex items-center justify-center animate-gentle-pulse`}>
+              <SparklesIcon className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} text-cyan-300`} />
             </div>
-            <h2 className="text-2xl font-light text-white mb-2">Quick Cosmic Fact</h2>
-            <p className="text-sm text-teal-300">Earn {currentQuestion.points} points</p>
+            <h2 className={`${compact ? 'text-xl' : 'text-2xl'} font-bold text-cyan-100 mb-2 font-brand`}>Quick Cosmic Fact</h2>
+            <p className={`${compact ? 'text-xs' : 'text-sm'} text-cyan-300`}>Earn {currentQuestion.points} points</p>
           </div>
 
           {/* Question */}
           {!showResult ? (
             <>
-              <p className="text-lg text-white/90 text-center mb-6 leading-relaxed">
+              <p className={`${compact ? 'text-base' : 'text-lg'} text-cyan-100 text-center mb-6 leading-relaxed font-medium`}>
                 {currentQuestion.question}
               </p>
 
               {/* Options */}
-              <div className="space-y-3 mb-6">
+              <div className={`space-y-3 mb-6 ${compact ? '' : ''}`}>
                 {currentQuestion.options.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswerSelect(index)}
                     disabled={selectedAnswer !== null}
-                    className={`w-full p-4 rounded-xl text-left transition-all duration-300 ${
+                    className={`w-full ${compact ? 'p-3 rounded-lg' : 'p-4 rounded-xl'} text-left transition-all duration-300 ${
                       selectedAnswer === index
-                        ? 'bg-cyan-500/20 border-2 border-cyan-400 scale-105'
-                        : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20'
+                        ? 'bg-cyan-400/20 border-2 border-cyan-300 scale-105 text-cyan-100'
+                        : 'bg-black/10 border border-cyan-400/10 hover:bg-cyan-400/10 hover:border-cyan-400/20 text-white'
                     }`}
                   >
-                    <span className="text-white font-medium">{option}</span>
+                    <span className="font-semibold">{option}</span>
                   </button>
                 ))}
               </div>
@@ -137,23 +138,23 @@ const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip }) =
           ) : (
             <>
               {/* Result */}
-              <div className={`text-center p-6 rounded-2xl mb-6 ${
+              <div className={`${compact ? 'text-center p-4 rounded-lg mb-4' : 'text-center p-6 rounded-2xl mb-6'} ${
                 isCorrect 
-                  ? 'bg-gradient-to-br from-cyan-500/10 to-teal-500/10 border border-cyan-400/30'
-                  : 'bg-gradient-to-br from-white/10 to-white/5 border border-white/20'
+                  ? 'bg-gradient-to-br from-cyan-400/10 to-teal-400/10 border border-cyan-400/30'
+                  : 'bg-gradient-to-br from-black/10 to-cyan-900/5 border border-cyan-400/10'
               }`}>
-                <div className="text-4xl mb-3">{isCorrect ? '✨' : '🌟'}</div>
-                <h3 className={`text-xl font-semibold mb-2 ${isCorrect ? 'text-teal-300' : 'text-white/80'}`}>
+                <div className={`${compact ? 'text-3xl' : 'text-4xl'} mb-3`}>{isCorrect ? '✨' : '🌟'}</div>
+                <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-bold mb-2 ${isCorrect ? 'text-cyan-300' : 'text-white/80'} font-brand`}>
                   {isCorrect ? `+${currentQuestion.points} Points!` : 'Good Try!'}
                 </h3>
-                <p className="text-sm text-white/80 leading-relaxed">
+                <p className={`${compact ? 'text-sm' : 'text-base'} text-cyan-100 leading-relaxed`}>
                   {currentQuestion.fact}
                 </p>
               </div>
 
               <button
                 onClick={handleContinue}
-                className="w-full py-4 bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/30"
+                className={`w-full ${compact ? 'py-3 text-sm' : 'py-4'} bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-900 rounded-full font-semibold hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/30`}
               >
                 Continue Your Journey
               </button>
@@ -164,7 +165,7 @@ const QuickWinTrivia: React.FC<QuickWinTriviaProps> = ({ onComplete, onSkip }) =
           {!showResult && (
             <button
               onClick={onSkip}
-              className="w-full text-sm text-white/50 hover:text-white/80 transition mt-4"
+              className={`w-full ${compact ? 'text-xs mt-3' : 'text-sm mt-4'} text-cyan-200 hover:text-cyan-100 transition`}
             >
               Skip for now
             </button>

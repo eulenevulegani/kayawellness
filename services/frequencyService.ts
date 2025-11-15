@@ -331,8 +331,63 @@ export class FrequencyGenerator {
    * Play a frequency profile
    */
   play(profile: FrequencyProfile, volume: number = 0.3): void {
-    // Disabled: No sound will be played
-    this.isPlaying = false;
+    if (!this.audioContext) return;
+
+    // create gain node for volume control
+    const gain = this.audioContext.createGain();
+    gain.gain.value = 0.0; // start silent for fade-in
+    gain.connect(this.audioContext.destination);
+    this.gainNodes.push(gain);
+
+    // If binauralBeat is provided and > 0, create two oscillators panned left/right
+    if (profile.binauralBeat && profile.binauralBeat > 0) {
+      const leftOsc = this.audioContext.createOscillator();
+      const rightOsc = this.audioContext.createOscillator();
+
+      // center frequency split across two channels
+      const diff = profile.binauralBeat / 2;
+      leftOsc.frequency.value = Math.max(0.1, profile.baseFrequency - diff);
+      rightOsc.frequency.value = Math.max(0.1, profile.baseFrequency + diff);
+
+      leftOsc.type = profile.waveType as OscillatorType;
+      rightOsc.type = profile.waveType as OscillatorType;
+
+      // create channel splitter via StereoPanner for simple lateralization
+      const leftPan = this.audioContext.createStereoPanner();
+      leftPan.pan.value = -0.8;
+      const rightPan = this.audioContext.createStereoPanner();
+      rightPan.pan.value = 0.8;
+
+      leftOsc.connect(leftPan);
+      rightOsc.connect(rightPan);
+      leftPan.connect(gain);
+      rightPan.connect(gain);
+
+      leftOsc.start();
+      rightOsc.start();
+
+      this.oscillators.push(leftOsc as OscillatorNode, rightOsc as OscillatorNode);
+    } else {
+      // single oscillator
+      const osc = this.audioContext.createOscillator();
+      osc.frequency.value = Math.max(0.1, profile.baseFrequency);
+      osc.type = profile.waveType as OscillatorType;
+      osc.connect(gain);
+      osc.start();
+      this.oscillators.push(osc as OscillatorNode);
+    }
+
+    // Fade-in
+    try {
+      const now = this.audioContext.currentTime;
+      gain.gain.linearRampToValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(volume, now + 1.0);
+    } catch (e) {
+      // ignore
+      gain.gain.value = volume;
+    }
+
+    this.isPlaying = true;
   }
 
   /**
@@ -365,8 +420,71 @@ export class FrequencyGenerator {
    * Play multiple frequencies simultaneously (soundscape)
    */
   playSoundscape(config: SoundscapeConfig): void {
-    // Disabled: No sound will be played
-    this.isPlaying = false;
+    if (!this.audioContext) return;
+
+    // Ensure context is running (resume on user gesture)
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(() => {});
+    }
+
+    // Stop any existing soundscape first
+    this.stop();
+
+    // Play ambient layers (noise generators)
+    if (config.ambientLayers && config.ambientLayers.length > 0) {
+      config.ambientLayers.forEach(layer => {
+        const gain = this.audioContext!.createGain();
+        gain.gain.value = 0.0;
+        gain.connect(this.audioContext!.destination);
+        this.gainNodes.push(gain);
+
+        // Create white noise buffer
+        const bufferSize = this.audioContext!.sampleRate * 2; // 2 seconds buffer
+        const buffer = this.audioContext!.createBuffer(1, bufferSize, this.audioContext!.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.2;
+        }
+
+        const src = this.audioContext!.createBufferSource();
+        src.buffer = buffer;
+        src.loop = true;
+
+        // apply simple filter to approximate pink/brown noise
+        const filter = this.audioContext!.createBiquadFilter();
+        if (layer.type === 'pink-noise') {
+          filter.type = 'lowpass';
+          filter.frequency.value = 1200;
+        } else if (layer.type === 'brown-noise') {
+          filter.type = 'lowpass';
+          filter.frequency.value = 800;
+        } else {
+          filter.type = 'bandpass';
+          filter.frequency.value = 1000;
+        }
+
+        src.connect(filter);
+        filter.connect(gain);
+        src.start();
+        // keep reference so we can stop later
+        (this.oscillators as any).push(src);
+
+        // Fade-in to target volume
+        const now = this.audioContext!.currentTime;
+        gain.gain.linearRampToValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(layer.volume, now + 1.0);
+      });
+    }
+
+    // Play each configured frequency with subtle balancing
+    const baseVolume = 0.08;
+    config.frequencies.forEach((f, i) => {
+      // spread volume across layers
+      const vol = baseVolume * (1 + (config.frequencies.length - i) * 0.5);
+      this.play(f, Math.min(vol, 0.45));
+    });
+
+    this.isPlaying = true;
   }
 
   getIsPlaying(): boolean {

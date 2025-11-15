@@ -41,15 +41,14 @@ const Explore: React.FC<ExploreProps> = ({ programs, onStartProgram, onStartActi
   const isPremium = userProfile.subscriptionTier === 'premium';
 
     const TABS: { id: ExploreTab; label: string; icon: React.ReactNode }[] = [
-        { id: 'breathe', label: 'Breathing Exercises', icon: <LungIcon className="w-6 h-6" /> },
         { id: 'soundscapes', label: 'Soundscapes', icon: <SoundIcon className="w-6 h-6" /> },
         { id: 'journeys', label: 'Journeys', icon: <StarIcon className="w-6 h-6" /> },
         { id: 'sleep', label: 'Sleep', icon: <MoonIcon className="w-6 h-6" /> },
     ];
 
-  const renderTabContent = () => {
-    switch(activeTab) {
-        case 'journeys':
+    const renderTabContent = () => {
+        switch(activeTab) {
+                case 'journeys':
             // Only the first journey is free, rest are premium
             const journeys = [
                 {
@@ -205,66 +204,7 @@ const Explore: React.FC<ExploreProps> = ({ programs, onStartProgram, onStartActi
                                 </div>
                             </div>
                         );
-        case 'breathe':
-                        // Well-researched breathing exercises
-                        const exercises = [
-                            {
-                                title: 'Box Breathing',
-                                pattern: { inhale: 4, hold: 4, exhale: 4, holdAfterExhale: 4 },
-                                description: 'A simple, effective technique for reducing stress and increasing focus. Inhale, hold, exhale, and hold again for equal counts.'
-                            },
-                            {
-                                title: '4-7-8 Breathing',
-                                pattern: { inhale: 4, hold: 7, exhale: 8 },
-                                description: 'Promotes relaxation and helps with sleep. Inhale for 4 seconds, hold for 7, exhale for 8.'
-                            },
-                            {
-                                title: 'Resonant Breathing',
-                                pattern: { inhale: 5, hold: 0, exhale: 5 },
-                                description: 'Balances the nervous system. Inhale for 5 seconds, exhale for 5 seconds.'
-                            },
-                            {
-                                title: 'Alternate Nostril Breathing',
-                                pattern: { inhale: 4, hold: 4, exhale: 4 },
-                                description: 'Balances left and right brain. Inhale, hold, and exhale through alternate nostrils.'
-                            }
-                        ];
-                        const freeExercises = exercises.slice(0, 1);
-                        const premiumExercises = exercises.slice(1);
-                        const itemsToShow = isPremium ? exercises : freeExercises;
-                        return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
-                                {exercises.map((item, index) => {
-                                    const isLocked = !isPremium && index > 0;
-                                    return (
-                                        <div key={index} className="bg-white/5 p-4 rounded-lg border border-white/10 flex flex-col text-left transition-all duration-300 hover:bg-white/10 hover:border-white/20 opacity-100">
-                                            <div className="flex-grow">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="w-8 h-8 flex-shrink-0 bg-cyan-400/20 text-cyan-300 rounded-full flex items-center justify-center mt-1">
-                                                        <LungIcon className="w-4 h-4" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-semibold text-white">{item.title}</h4>
-                                                        <p className="text-sm text-white/70">{item.description}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {isLocked ? (
-                                                <button disabled className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-200 rounded-full border border-cyan-400/30 opacity-60 cursor-not-allowed">
-                                                    <PlayIcon className="w-4 h-4"/>
-                                                    <span className="flex-1">Upgrade to KAYA+ to unlock</span>
-                                                </button>
-                                            ) : (
-                                                <button onClick={() => onStartActivity({ type: 'breathwork', data: item, forceAnimator: true })} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-200 rounded-full hover:bg-cyan-500/30 transition text-sm font-semibold border border-cyan-400/30">
-                                                    <PlayIcon className="w-4 h-4"/>
-                                                    Start Exercise
-                                                </button>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        );
+
         case 'sleep':
             return (
                 <div className="text-center p-8 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-xl animate-fade-in border border-cyan-400/30 relative overflow-hidden">

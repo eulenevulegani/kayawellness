@@ -13,7 +13,7 @@ interface PostSessionScreenProps {
 
 const PostSessionScreen: React.FC<PostSessionScreenProps> = ({ onAddGratitude, onDone, gratitudeEntries, onSaveReflection }) => {
   // Show trivia 50% of the time for quick dopamine hit
-  const [showTrivia, setShowTrivia] = useState(Math.random() > 0.5);
+    const [showTrivia, setShowTrivia] = useState(false);
 
   // Handle trivia completion
   const handleTriviaComplete = (earnedPoints: number) => {

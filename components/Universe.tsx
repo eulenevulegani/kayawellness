@@ -50,14 +50,6 @@ const Universe: React.FC<UniverseProps> = ({ onNavigate }) => {
       borderColor: 'border-indigo-400/30'
     },
     {
-      id: 'resources' as AppView,
-      emoji: '📚',
-      title: 'Wellness Resources',
-      description: 'Articles, videos, and tools for your wellness journey',
-      gradient: 'from-emerald-500/10 to-green-500/10',
-      borderColor: 'border-emerald-400/30'
-    },
-    {
       id: 'insights' as AppView,
       emoji: '🪐',
       title: 'Your Insights',

@@ -1,0 +1,68 @@
+/* Global responsive helpers for KAYA
+   - Ensures images, media and containers scale on small screens
+   - Adds safe paddings and touch target improvements
+   - Non-invasive and conservative
+*/
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Make images and media fluid */
+img, video, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Ensure long text wraps on small screens */
+* {
+  word-break: break-word;
+}
+
+/* Base app container to add horizontal padding on small devices */
+.app-responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem; /* 16px */
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .app-responsive-container {
+    padding-left: 1.5rem; /* 24px */
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-responsive-container {
+    padding-left: 2rem; /* 32px */
+    padding-right: 2rem;
+  }
+}
+
+/* Touch-friendly buttons: ensure tappable area without changing visuals */
+button, .button-like {
+  padding: 0.6rem 0.9rem; /* slightly larger taps */
+  min-height: 44px;
+}
+
+/* Reduce large shadows and fixed widths on tiny screens */
+@media (max-width: 420px) {
+  .lg\:p-8 { padding: 1rem; }
+  .lg\:rounded-3xl { border-radius: 1rem; }
+}
+
+/* Ensure modals don't exceed viewport height */
+.modal, .fixed.inset-0 > div {
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+/* Improve font-size scaling on very small devices */
+@media (max-width: 360px) {
+  body { font-size: 13px; }
+}

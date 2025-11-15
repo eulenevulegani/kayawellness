@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { PlayIcon, PauseIcon } from './Icons';
 import { frequencyGenerator, getFrequenciesForConcern, generateSoundscapeConfig } from '../services/frequencyService';
 
@@ -8,6 +8,7 @@ interface SoundscapePlayerProps {
   description: string;
   concerns?: string[];
   timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night' | string;
+  hideUI?: boolean;
 }
 
 
@@ -15,16 +16,15 @@ interface SoundscapePlayerProps {
 // getSoundscapeUrl is now a no-op
 const getSoundscapeUrl = (title: string): string => '';
 
-const SoundscapePlayer: React.FC<SoundscapePlayerProps> = ({ 
-  title, 
-  description, 
-  concerns = ['meditation'],
-  timeOfDay = 'afternoon'
-}) => {
+const SoundscapePlayer = forwardRef(function SoundscapePlayer(
+  props: SoundscapePlayerProps,
+  ref
+) {
+  const { title, description, concerns = ['meditation'], timeOfDay = 'afternoon', hideUI = false } = props;
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeFrequency, setActiveFrequency] = useState<string>('');
-  // Removed audioRef for silent soundscapes
+  const localRef = useRef<any>(null);
 
   // Determine current time of day if not provided
   const getCurrentTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
@@ -66,67 +66,64 @@ const SoundscapePlayer: React.FC<SoundscapePlayerProps> = ({
     }
   };
 
-  return (
-    <div className="flex flex-col items-center space-y-6 text-center">
-      <p className="text-white/80">{description}</p>
-      
-      {/* Frequency Information */}
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
-        <h4 className="text-sm font-semibold text-cyan-300 mb-3">Therapeutic Frequencies</h4>
-        <div className="space-y-2">
-          {frequencies.slice(0, 3).map((freq, index) => (
-            <div key={index} className="text-left">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-white">{freq.name}</span>
-                <span className="text-xs text-cyan-400">{freq.baseFrequency} Hz</span>
-              </div>
-              <p className="text-xs text-white/60">{freq.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+  // Expose imperative methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    playAmbient: () => {
+      try {
+        frequencyGenerator.playSoundscape(soundscapeConfig);
+        setIsPlaying(true);
+      } catch (e) {
+        console.error('Failed to play ambient:', e);
+      }
+    },
+    stopAmbient: () => {
+      frequencyGenerator.stop();
+      setIsPlaying(false);
+    }
+  }));
 
+  // Auto-play when hide UI is desired (useful for in-session ambient)
+  useEffect(() => {
+    if (hideUI) {
+      try {
+        frequencyGenerator.playSoundscape(soundscapeConfig);
+        setIsPlaying(true);
+      } catch (e) {
+        // may require user gesture
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hideUI]);
+
+  return (
+    <div ref={localRef} className="flex flex-col items-center space-y-6 text-center">
+      <p className="text-white/80">{description}</p>
       {isLoading ? (
         <div className="flex flex-col items-center justify-center space-y-4 h-20">
           <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-          <p className="text-white/60 text-sm">Initializing frequencies...</p>
+          <p className="text-white/60 text-sm">Initializing ambient sound...</p>
         </div>
       ) : (
         <div className="flex flex-col items-center gap-4">
+          {/* Skip button for ambient sound */}
           <button
-            onClick={togglePlayback}
-            className={`w-20 h-20 rounded-full flex items-center justify-center text-white transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50 ${
-              isPlaying 
-                ? 'bg-cyan-500/30 hover:bg-cyan-500/40 animate-pulse-slow' 
-                : 'bg-white/10 hover:bg-white/20'
-            }`}
-            aria-label={isPlaying ? 'Pause soundscape' : 'Play soundscape'}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                frequencyGenerator.stop();
+                setIsPlaying(false);
+              }
+              if (typeof (window as any).onAmbientSkip === 'function') {
+                (window as any).onAmbientSkip();
+              }
+            }}
+            className="mt-4 px-8 py-2 bg-cyan-400/80 text-cyan-900 font-semibold rounded-full shadow hover:bg-cyan-300 transition-colors text-base"
           >
-            {isPlaying ? <PauseIcon className="w-10 h-10" /> : <PlayIcon className="w-10 h-10" />}
+            Skip
           </button>
-          
-          {isPlaying && activeFrequency && (
-            <div className="text-center">
-              <p className="text-xs text-white/60">Now playing:</p>
-              <p className="text-sm font-medium text-cyan-300">{activeFrequency}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Benefits Display */}
-      {frequencies.length > 0 && (
-        <div className="w-full max-w-md bg-gradient-to-br from-cyan-500/5 to-blue-500/5 border border-cyan-400/20 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-white mb-2">✨ Benefits</h4>
-          <ul className="text-xs text-white/70 space-y-1">
-            {frequencies[0].benefits.slice(0, 3).map((benefit, index) => (
-              <li key={index}>• {benefit}</li>
-            ))}
-          </ul>
         </div>
       )}
     </div>
   );
-};
+});
 
 export default SoundscapePlayer;
